@@ -5,6 +5,9 @@ import controller.Controller;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 
 public class CreateElection extends JPanel {
     private JLabel label;
@@ -40,7 +43,7 @@ public class CreateElection extends JPanel {
         //and @FormPanelListner
         formPanel.setFormPanelListner(new FormPanelListner() {
             @Override
-            public void formPanelEventOccured(FormPanelEvent e) {
+            public void formPanelEventOccured(FormPanelEvent e) throws SQLException {
 
                 //Setting Id to @electionId and noofCandidate  and pass both values to setElectionId Function
                 String electionId=e.getId();
@@ -56,11 +59,10 @@ public class CreateElection extends JPanel {
         //and @FormPanelListner
         candidatePanel.setCandidateFormPanelListner(new CandidateFormPanelListner() {
             @Override
-            public void candidateFormEventOccured(CandidateFormPanelEvent e) {
-                System.out.println(e.getElectionId());
-                System.out.println(e.getCandidateDetails());
-                System.out.println(e.getCandidatePhotoPath());
-                System.out.println(e.getCandidateSymbolPhotoPath());
+            public void candidateFormEventOccured(CandidateFormPanelEvent e) throws IOException {
+
+                //Seding Event to  Controller.......
+                controller.addCandidateDetails(e);
             }
         });
     }

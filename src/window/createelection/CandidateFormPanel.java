@@ -6,6 +6,7 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.prefs.Preferences;
 
 public class CandidateFormPanel extends JPanel implements ActionListener {
@@ -270,7 +271,7 @@ public class CandidateFormPanel extends JPanel implements ActionListener {
             if (r == JFileChooser.APPROVE_OPTION) {
                 // set the label to the path of the selected file
                 filePath1.setText(chooser.getSelectedFile().getName());
-                imgPath = chooser.getSelectedFile().getPath();
+                imgPath = chooser.getSelectedFile().getAbsolutePath();
 
             }
         }
@@ -293,7 +294,7 @@ public class CandidateFormPanel extends JPanel implements ActionListener {
             if (rx == JFileChooser.APPROVE_OPTION) {
                 // set the label to the path of the selected file
                 filePath2.setText(chooser.getSelectedFile().getName());
-                symPath = chooser.getSelectedFile().getPath();
+                symPath = chooser.getSelectedFile().getAbsolutePath();
 
             }
         }
@@ -305,13 +306,18 @@ public class CandidateFormPanel extends JPanel implements ActionListener {
             //We Just Need to Create for @detailsField and candidateID
             Integer canID = Integer.parseInt(candidateIdField.getText());
             String details = candidateDetail.getText();
+            String Name = candidateName.getText();
 
             //Creating Object of CandidateFormPanelEvent
-            CandidateFormPanelEvent ev = new CandidateFormPanelEvent(this,electionIdField.getText(),canID,details,imgPath,symPath);
+            CandidateFormPanelEvent ev = new CandidateFormPanelEvent(this,electionIdField.getText(),canID,Name,details,imgPath,symPath);
 
             //Passing the CandidateFormPanel Event if listner is not Empty
             if(listner!=null){
-                listner.candidateFormEventOccured(ev);
+                try {
+                    listner.candidateFormEventOccured(ev);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
 
             //Canging Prefs Key @first to false if User used initial Election ID..
@@ -321,7 +327,7 @@ public class CandidateFormPanel extends JPanel implements ActionListener {
             addMoreBtn.setEnabled(true);
         }
         else if(clickedBtn == addMoreBtn){
-            if(candidateCounter <=noOfCandidates){
+            if(candidateCounter <noOfCandidates){
 
                 /////Incresing Candidate Id////////
                 count = prefs.getInt("id",101);

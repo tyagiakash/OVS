@@ -2,63 +2,111 @@ package model;
 
 import window.createelection.CreateElection;
 
-import javax.print.attribute.standard.JobKOctetsProcessed;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.sql.*;
 
 public class Database extends Component {
 
-    //Creating Variables for Storing Data...
-    private String electionId;
-    private String electionTitle;
-    private Integer noOfCandidates;
-    private String place;
-    private String date;
+    //Create Varibale for Srtup Connection
+    private Connection conn = null;
 
-    public Database() {
-
-    }
-
-    //Function for Adding Election Details to the DataBase....
-    public void addElectionDetailsToDB(String Id,String title,Integer noOfCand,String place,String date){
-       this.electionId = Id;
-       this.electionTitle =title;
-       this.noOfCandidates = noOfCand;
-       this.place = place;
-       this.date = date;
-
-        try {
+    //Function for create Connection between OVS and DB
+    public  void createConnection(){
+        if(conn != null) return;
+        try{
+            //Class Path for Java MYSQL Drivers.....
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con= DriverManager.getConnection(
+
+            //Connecting to Db using credntials...
+             conn= DriverManager.getConnection(
                     "jdbc:mysql://sql12.freemysqlhosting.net/sql12380026","sql12380026","l4i2V9CQUr");
-            Statement stmt=(Statement) con.createStatement();
-//            ResultSet rs=stmt.executeQuery("select * from ElectionDetails");
-
-          String query = " insert into ElectionDetails" + " values (?, ?, ?, ?, ?)";
-
-          // create the mysql insert preparedstatement
-          PreparedStatement preparedStmt = con.prepareStatement(query);
-          preparedStmt.setString (1, electionId);
-          preparedStmt.setString (2, electionTitle);
-          preparedStmt.setInt   (3, noOfCandidates);
-          preparedStmt.setString(4, place);
-          preparedStmt.setDate  (5, Date.valueOf(date));
-
-            // execute the preparedstatement
-            preparedStmt.execute();
-            System.out.println("Helloooo");
-
-            con.close();
-
-            JOptionPane.showMessageDialog(this,"Successfully Updated","Alert",JOptionPane.WARNING_MESSAGE);
-
+             System.out.println("Connected Successfuly!!!!!!!");
         } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error Occured During Connectio..");
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this,e,"Error...",JOptionPane.ERROR_MESSAGE);
-
         }
     }
 
+    //Function for Disconnect DB connection
+    public  void disconnectConnection(){
+        if (conn != null) {
+            try {
+                conn.close();
+                System.out.println("Disconect Successfully..");
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+                System.out.println("Can't Disconnct Error Occured!!!");
+            }
+        }
+    }
+
+
+    //Function for Adding Election Details to the DataBase....
+    public void addElectionDetailsToDB(String Id,String title,Integer noOfCand,String mplace,String mdate) {
+
+       try {
+
+           //Making  Query for Adding all the data......
+           String query = " insert into ElectionDetails" + " values (?, ?, ?, ?, ?)";
+
+           // create the mysql insert preparedstatement
+           PreparedStatement preparedStmt = conn.prepareStatement(query);
+           preparedStmt.setString(1, Id);
+           preparedStmt.setString(2, title);
+           preparedStmt.setInt(3, noOfCand);
+           preparedStmt.setString(4, mplace);
+           preparedStmt.setDate(5, Date.valueOf(mdate));
+
+           // execute the preparedstatement
+           preparedStmt.executeUpdate();
+
+           //Show dailog for Successfully Update the data....
+           JOptionPane.showMessageDialog(this, "Successfully Updated", "Alert", JOptionPane.INFORMATION_MESSAGE);
+       }catch (Exception e){
+
+           //Show dailog for  Showing an Error...
+           JOptionPane.showMessageDialog(this, e, "Error Occured!!", JOptionPane.ERROR_MESSAGE);
+       }
+    }
+
+    //Function for Adding Candidate  Details to the DataBase....
+    public void addCandidateDetailsToDB(String mEId, Integer mCId,String cName,String cDetails, String mCDetails, String mCPhotoPath, String mCSymPhoPath) throws IOException {
+
+        //Converting Images to byte..
+        InputStream iPhoto = new FileInputStream(new File(mCPhotoPath));
+        InputStream iSymbol = new FileInputStream(new File(mCSymPhoPath));
+
+        try {
+
+            //Making  Query for Adding all the data......
+            String query = " insert into CandidateDetails(ElectionId,CandidateId,CandidateName,Details,Photo,Symbol)" + " values (?, ?, ?, ?, ?, ?)";
+
+            // create the mysql insert preparedstatement
+            PreparedStatement preparedStmt = conn.prepareStatement(query);
+            preparedStmt.setString(1,mEId);
+            preparedStmt.setInt(2, mCId);
+            preparedStmt.setString(3,cName);
+            preparedStmt.setString(4, cDetails);
+            preparedStmt.setBlob(5,iPhoto);
+            preparedStmt.setBlob(6,iSymbol);
+
+
+            // execute the preparedstatement
+            preparedStmt.execute();
+
+            //Show dailog for  Showing an Successfully...
+            JOptionPane.showMessageDialog(this, "Data Inserted Successfullly!!!", "Data Inserted", JOptionPane.INFORMATION_MESSAGE);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e, "Error Occured!!", JOptionPane.ERROR_MESSAGE);
+        }
+
+
+    }
 
 }

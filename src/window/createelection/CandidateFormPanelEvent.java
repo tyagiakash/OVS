@@ -10,6 +10,7 @@ public class CandidateFormPanelEvent extends EventObject {
     //Creating Variables for Storing Data..
     private String electionId;
     private String candidateDetails;
+    private String candidateName;
     private String candidatePhotoPath;
     private String candidateSymbolPhotoPath;
     private Integer candidateId;
@@ -18,18 +19,23 @@ public class CandidateFormPanelEvent extends EventObject {
         super(source);
     }
 
-    public CandidateFormPanelEvent(Object source,String electionId,Integer candidateId,String candidateDetails,String candidatePhotoPath,String candidateSymbolPhotoPath) {
+    public CandidateFormPanelEvent(Object source,String electionId,Integer candidateId,String candidateName,String candidateDetails,String candidatePhotoPath,String candidateSymbolPhotoPath) {
 
         super(source);
 
         this.electionId = electionId;
         this.candidateId = candidateId;
+        this.candidateName = candidateName;
         this.candidateDetails = candidateDetails;
         this.candidatePhotoPath = candidatePhotoPath;
         this.candidateSymbolPhotoPath = candidateSymbolPhotoPath;
     }
     //Setting Up Getters for These Variables.....
 
+
+    public String getCandidateName() {
+        return candidateName;
+    }
 
     public Integer getCandidateId() {
         return candidateId;

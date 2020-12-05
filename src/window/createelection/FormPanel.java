@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.prefs.Preferences;
 
 public class FormPanel extends JPanel implements ActionListener {
@@ -201,11 +202,12 @@ public class FormPanel extends JPanel implements ActionListener {
             FormPanelEvent ev = new FormPanelEvent(this,id,title,noOfCandidate,place,date);
 
             if (listner!=null){
-                listner.formPanelEventOccured(ev);
+                try {
+                    listner.formPanelEventOccured(ev);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
-
-            JOptionPane.showMessageDialog(this,"Successfully Saved!!","Alert",JOptionPane.WARNING_MESSAGE);
-
 
             //Setting All Field Lock once user Entered All Details
             //also Changin @saveBtnState so that @resetBtn not Works once Fields Locked
