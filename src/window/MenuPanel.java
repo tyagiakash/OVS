@@ -5,6 +5,8 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.sql.SQLException;
 
 public class MenuPanel extends JPanel implements ActionListener {
 
@@ -40,7 +42,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         //Initialization of  the  Buttons
         btn1 = new JButton("Create Election");
         btn2 = new JButton("View Elections");
-        btn3 = new JButton("Three");
+        btn3 = new JButton("Voter");
         btn4 = new JButton("Four");
         btn5 = new JButton("Five");
         btn6 = new JButton("Six");
@@ -84,7 +86,11 @@ public class MenuPanel extends JPanel implements ActionListener {
         if(clicked == btn1){
             if(menuListner!=null){
                 setButtonColor();
-                menuListner.buttonClicked("btn1");
+                try {
+                    menuListner.buttonClicked("btn1");
+                } catch (SQLException | IOException throwables) {
+                    throwables.printStackTrace();
+                }
                 btn1.setBackground(Color.MAGENTA);
 
             }
@@ -92,28 +98,48 @@ public class MenuPanel extends JPanel implements ActionListener {
         else if(clicked == btn2){
             if(menuListner!=null){
                 setButtonColor();
-                menuListner.buttonClicked("btn2");
+                try {
+                    menuListner.buttonClicked("btn2");
+                } catch (SQLException | IOException throwables) {
+                    throwables.printStackTrace();
+                }
                 btn2.setBackground(Color.MAGENTA);
             }
         }
         else if(clicked == btn3){
             if(menuListner!=null){
-                menuListner.buttonClicked("btn3");
+                try {
+                    menuListner.buttonClicked("btn3");
+                } catch (SQLException | IOException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         }
         else if(clicked == btn4){
             if(menuListner!=null){
-                menuListner.buttonClicked("btn4");
+                try {
+                    menuListner.buttonClicked("btn4");
+                } catch (SQLException | IOException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         }
         else if(clicked == btn5){
             if(menuListner!=null){
-                menuListner.buttonClicked("btn5");
+                try {
+                    menuListner.buttonClicked("btn5");
+                } catch (SQLException | IOException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         }
         else if(clicked == btn6){
             if(menuListner!=null){
-                menuListner.buttonClicked("btn6");
+                try {
+                    menuListner.buttonClicked("btn6");
+                } catch (SQLException | IOException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         }
 

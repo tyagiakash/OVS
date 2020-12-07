@@ -1,9 +1,9 @@
 package window.viewelection;
 
+import model.ElectionDetailsPrintData;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import javax.swing.table.*;
 import java.util.ArrayList;
 
 public class PrintableForm extends JPanel {
@@ -28,15 +28,25 @@ public class PrintableForm extends JPanel {
     private JLabel eligiblityLabel;
 
     //Variable for Storing No of Candidates
-    private Integer noOfCandidates = 3;
+    private Integer noOfCandidates;
+
+    //Declaring Array of model@ElectionDetailsPrintData for fetching all data through..
+    //Database --->  Controller  ---> ViewElection --->this
+    private ArrayList<ElectionDetailsPrintData> arrayofData;
 
 
-    public PrintableForm(){
+    public PrintableForm(ArrayList<ElectionDetailsPrintData> data){
+
+        this.arrayofData = data;
+
+        //Getting No. of Candidates from Array So that we can define the exact size of the panel..
+        noOfCandidates = arrayofData.get(0).getTotalCandidates();
 
         Dimension dm = getPreferredSize();
         Integer tempHeight = 470+ 120*(noOfCandidates-1);
         dm.height = tempHeight;
         setPreferredSize(dm);
+        revalidate();
 
 
         //Initializing Components
@@ -48,13 +58,15 @@ public class PrintableForm extends JPanel {
         dateLabelH = new JLabel("Date: ");
         eligiblityLabelH =new JLabel("Eligiblity: ");
         candidateDetailsH = new JLabel("Candidate Details: ");
+        //cHeadingPanel is Border small layout that feels like a table Header...
         cHeadingPanel = new CandidateDetailsHeadingsPanel();
 
+        //Getting Election Data from @arrayOfData... and pass to the labels of ElectionDetails Portion...
 
-        electionIdLabel = new JLabel("E12523");
-        electionTitleLabel = new JLabel("Presedent Election at GKV");
-        placeLabel = new JLabel("GKV");
-        dateLabel = new JLabel("05/01/2021");
+        electionIdLabel = new JLabel(arrayofData.get(0).getElectionId());
+        electionTitleLabel = new JLabel(arrayofData.get(0).getElectionTitle());
+        placeLabel = new JLabel(arrayofData.get(0).getPlace());
+        dateLabel = new JLabel(arrayofData.get(0).getDate());
         eligiblityLabel =new JLabel("All Students");
 
 
@@ -62,25 +74,10 @@ public class PrintableForm extends JPanel {
         setBackground(Color.decode("#ffffff"));
         GridBagConstraints gc = new GridBagConstraints();
 
-        /////////////////////Temporary///////////////////
-
-        //Resizing Images @Candidate Image
-        ImageIcon imgIcon1 = new ImageIcon("/home/akash/Downloads/start.jpg");
-
-        Image imgTemp = imgIcon1.getImage();
-
-        Image modifiedImgIcon = imgTemp.getScaledInstance(90,90,Image.SCALE_SMOOTH);
-
-        imgIcon1 = new ImageIcon(modifiedImgIcon);
-//
-//        cPanel1 = new CandidatePrintablePhotosPanel(imgIcon1,imgIcon1,"Lalit Tyagi");
-//        cPanel3 = new CandidatePrintablePhotosPanel(imgIcon1,imgIcon1,"Akash Tyagi");
-//        cPanel2 = new CandidatePrintablePhotosPanel(imgIcon1,imgIcon1,"Rishab Tyagi");
-        jpanel[0] = new CandidatePrintablePhotosPanel(imgIcon1,imgIcon1,"Lalit Tyagi");
-        jpanel[1]=  new CandidatePrintablePhotosPanel(imgIcon1,imgIcon1,"Akash Tyagi");
-        jpanel[2] = new CandidatePrintablePhotosPanel(imgIcon1,imgIcon1,"Rishab Tyagi");
-
-     //////////////Temporary Ends?????????????
+        //Create Object of CandidatesPrintablePhotosPanel equal to no of candidates....
+        for (int i =0;i<noOfCandidates;i++){
+            jpanel[i] = new CandidatePrintablePhotosPanel(arrayofData.get(i).getCandidatePhoto(),arrayofData.get(i).getElectionSymbolPhoto(),arrayofData.get(i).getCandidateName());
+        }
 
 
         //Adding Row 1
@@ -116,6 +113,7 @@ public class PrintableForm extends JPanel {
         add(electionIdLabelH,gc);
 
         gc.gridx++;
+        gc.insets = new Insets(0,0,0,0);
         gc.anchor =GridBagConstraints.LINE_START;
         add(electionIdLabel,gc);
 
@@ -130,6 +128,7 @@ public class PrintableForm extends JPanel {
         add(electionTitleLabelH,gc);
 
         gc.gridx++;
+        gc.insets = new Insets(0,0,0,0);
         gc.anchor =GridBagConstraints.LINE_START;
         add(electionTitleLabel,gc);
 
@@ -145,6 +144,7 @@ public class PrintableForm extends JPanel {
         add(eligiblityLabelH,gc);
 
         gc.gridx++;
+        gc.insets = new Insets(0,0,0,0);
         gc.anchor =GridBagConstraints.LINE_START;
         add(eligiblityLabel,gc);
 
@@ -159,6 +159,7 @@ public class PrintableForm extends JPanel {
         add(dateLabelH,gc);
 
         gc.gridx++;
+        gc.insets = new Insets(0,0,0,0);
         gc.anchor =GridBagConstraints.LINE_START;
         add(dateLabel,gc);
 
@@ -173,6 +174,7 @@ public class PrintableForm extends JPanel {
         add(placeLabelH,gc);
 
         gc.gridx++;
+        gc.insets = new Insets(0,0,0,0);
         gc.anchor =GridBagConstraints.LINE_START;
         add(placeLabel,gc);
 

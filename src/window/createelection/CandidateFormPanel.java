@@ -224,7 +224,6 @@ public class CandidateFormPanel extends JPanel implements ActionListener {
 
 
 
-
         //Row 8
         gc.gridy = 7;
         gc.gridx = 0;
@@ -299,32 +298,45 @@ public class CandidateFormPanel extends JPanel implements ActionListener {
             }
         }
         else if(clickedBtn == saveBtn){
-            ConfirmDialog dial = new ConfirmDialog(imgPath,symPath,candidateName.getText(),"E15263");
-            dial.setVisible(true);
 
-            //Creating Variables for Storing Field Data, three Variable already Created we Need
-            //We Just Need to Create for @detailsField and candidateID
-            Integer canID = Integer.parseInt(candidateIdField.getText());
-            String details = candidateDetail.getText();
-            String Name = candidateName.getText();
+            //Creating Instance of Custom Confirm Dialog Class for Showing
+            //Images and confirmation to save into database...
+            ConfirmDialog dial = new ConfirmDialog(imgPath,symPath,candidateName.getText(),electionIdField.getText());
 
-            //Creating Object of CandidateFormPanelEvent
-            CandidateFormPanelEvent ev = new CandidateFormPanelEvent(this,electionIdField.getText(),canID,Name,details,imgPath,symPath);
+            //Creating a Joption Pane and Passing ConfirmDialog Panel to it..
+            //In Joption pane we pass null instead of this , because this make
+            //Joption Pane Independent , it comes from center
+            int a = JOptionPane.showConfirmDialog(null,dial,"Confirm Data..",JOptionPane.INFORMATION_MESSAGE);
 
-            //Passing the CandidateFormPanel Event if listner is not Empty
-            if(listner!=null){
-                try {
-                    listner.candidateFormEventOccured(ev);
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
+            //if user selected to Yes.. then save data to the DB..
+            if(a==JOptionPane.YES_OPTION) {
+                JOptionPane.getRootFrame().dispose();
+
+
+                //Creating Variables for Storing Field Data, three Variable already Created we Need
+                //We Just Need to Create for @detailsField and candidateID
+                Integer canID = Integer.parseInt(candidateIdField.getText());
+                String details = candidateDetail.getText();
+                String Name = candidateName.getText();
+
+                //Creating Object of CandidateFormPanelEvent
+                CandidateFormPanelEvent ev = new CandidateFormPanelEvent(this, electionIdField.getText(), canID, Name, details, imgPath, symPath);
+
+                //Passing the CandidateFormPanel Event if listner is not Empty
+                if (listner != null) {
+                    try {
+                        listner.candidateFormEventOccured(ev);
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
                 }
+
+                //Canging Prefs Key @first to false if User used initial Election ID..
+                prefs.putBoolean("first", false);
+
+                //Enabling add More Button
+                addMoreBtn.setEnabled(true);
             }
-
-            //Canging Prefs Key @first to false if User used initial Election ID..
-            prefs.putBoolean("first",false);
-
-
-            addMoreBtn.setEnabled(true);
         }
         else if(clickedBtn == addMoreBtn){
             if(candidateCounter <noOfCandidates){
@@ -344,7 +356,7 @@ public class CandidateFormPanel extends JPanel implements ActionListener {
                 candidateCounter++;
             }
             else{
-                JOptionPane.showMessageDialog(this,"You Already Added Maximum Number Of Candidate!","Error",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,"You Already Added Maximum Number Of Candidate!","Error",JOptionPane.ERROR_MESSAGE);
                 addMoreBtn.setEnabled(false);
             }
 

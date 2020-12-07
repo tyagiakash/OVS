@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class Database extends Component {
 
@@ -105,8 +106,86 @@ public class Database extends Component {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e, "Error Occured!!", JOptionPane.ERROR_MESSAGE);
         }
+    }
 
+    //Function for Getting all Election Id's from Database...
+    public ArrayList<String> getElectionIdsFromDB() throws SQLException {
 
+        //Creating array list to store fetched ID's from Database..
+        ArrayList<String> electionIds = new ArrayList<String>();
+
+        //Making  Query for Getting  all the ElectionID's......
+        String query = "SELECT `ElectionId` FROM `ElectionDetails` WHERE 1";
+
+        // Create statement object..
+        Statement stmt = conn.createStatement();
+
+        // execute the preparedstatement and save to ResultSet ob..
+        ResultSet rs = stmt.executeQuery(query);
+
+        //Adding all ElectionId's to the array List...
+        while (rs.next()){
+            electionIds.add(rs.getString("ElectionId"));
+        }
+        //Returning the array list of containing all electionId's
+        return electionIds;
+    }
+
+    //Create Function for Getting all details from Election Details and
+    //Candidate Detls Tables form Database... and it return araayList of ElectionDetailsPrintData
+    public  ArrayList<ElectionDetailsPrintData> getPrintableElectionData(String searchEid) throws SQLException, IOException {
+
+        //Creating a Array of ElectionDetailsPrintData Model for Storing the
+        //Different number of Rows...
+         ArrayList<ElectionDetailsPrintData> arrayOfData;
+         arrayOfData = new ArrayList<ElectionDetailsPrintData>();
+
+        //Making  Query for Getting  all the Columns of ElectionDetails
+        // and Candidate table Columns's...... of specific ElectionId...
+        String query = "SELECT * FROM ElectionDetails INNER JOIN CandidateDetails ON ElectionDetails.ElectionId = CandidateDetails.ElectionId " +
+                "WHERE ElectionDetails.ElectionId ="+ "'" + searchEid +"'";
+
+        // Create statement object..
+        Statement stmt = conn.createStatement();
+
+        // execute the preparedstatement and save to ResultSet ob..
+        ResultSet rs = stmt.executeQuery(query);
+
+        //Iterate rs to the for each row...
+
+        while (rs.next()){
+
+              //Variables for Storing Fetched data from db..
+              String eID = rs.getString("ElectionId");
+              String eTitle = rs.getString("ElectionTitle");
+              Integer tCandidates = rs.getInt("TotalCandidates");
+              String ePlace = rs.getString("Place");
+              String eDate = rs.getDate("Date").toString();
+              Integer cID = rs.getInt("CandidateId");
+              String cName = rs.getString("CandidateName");
+              String cDetails = rs.getString("Details");
+              Blob cPhoto = rs.getBlob("Photo");
+              Blob cSymbol = rs.getBlob("Symbol");
+
+              ImageIcon photoIcon = convertImage(cPhoto);
+              ImageIcon symbolIcon = convertImage(cSymbol);
+
+              //Creating a temporary object of ElectionDetailsPrint Data Model
+              // and add this to the arrayList of same type for multiple rows
+              ElectionDetailsPrintData temp = new ElectionDetailsPrintData(eID,eTitle,tCandidates,ePlace,eDate,cID,cName,cDetails,photoIcon,symbolIcon);
+              arrayOfData.add(temp);
+        }
+        return arrayOfData;
+    }
+
+    //Functionn to convert A Blob object to Buffered Image and resize it
+    private ImageIcon convertImage(Blob b) throws SQLException, IOException {
+        BufferedImage bufferedImage;
+        InputStream inputStream = b.getBinaryStream(1,b.length());
+        bufferedImage = ImageIO.read(inputStream);
+        Image tImage = (Image)bufferedImage;
+        Image modifiedImgIcon = tImage.getScaledInstance(100,100,Image.SCALE_SMOOTH);
+        return new ImageIcon(modifiedImgIcon);
     }
 
 }

@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class ConfirmDialog extends JDialog {
+public class ConfirmDialog extends JPanel {
 
     private JButton btnOk;
     private JLabel imgLabel1;
@@ -18,10 +18,16 @@ public class ConfirmDialog extends JDialog {
     public ConfirmDialog(String mImgPath,String mSymPath,String mName,String mElectionId){
         super();
 
-        setTitle("Data Saved Successfully !!");
-        setSize(450,300);
+       //Checking Image and Symbol path if it is null then we give it a default image path..
+       if (mImgPath == null){
+           mImgPath = "src/images/noImage.png";
+       }
+       if (mSymPath == null){
+           mSymPath = "src/images/noImage.png";
+       }
+
         setLayout(new GridBagLayout());
-        setLocationRelativeTo(getParent());
+
 
         //Initialization Objects
         imgLabel1 = new JLabel();
@@ -30,14 +36,6 @@ public class ConfirmDialog extends JDialog {
         electionIdLabel =new JLabel("Election Id: "+mElectionId+":");
         btnOk = new JButton("OK");
         btnOk.setFocusPainted(false);
-
-        //Setting Listner On @btnOk
-        btnOk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
 
 
         //Resizing Images @Candidate Image
@@ -96,13 +94,6 @@ public class ConfirmDialog extends JDialog {
         gc.anchor = GridBagConstraints.FIRST_LINE_START;
         add(imgLabel2,gc);
 
-        //Row 3
-        gc.gridy = 2;
-        gc.gridx = 1;
-        gc.weighty = 1;
-        gc.weightx = 1;
-        gc.anchor = GridBagConstraints.FIRST_LINE_START;
-        add(btnOk,gc);
 
     }
 

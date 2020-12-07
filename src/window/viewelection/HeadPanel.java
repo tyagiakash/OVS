@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class HeadPanel extends JPanel implements ItemListener, ActionListener {
 
@@ -16,14 +19,24 @@ public class HeadPanel extends JPanel implements ItemListener, ActionListener {
     private JButton viewBtn;
     private JButton printBtn;
 
+
+    //Creating a Array List of ElectionID's
+    private ArrayList<String> electionIDs;
+
+    //String Variable for Storing Current element Selected in JComboBox..
+    private String currentId =  "Select";
+
     //Creating Instnce of HeadPanelListener
     private HeadPanelListner headPanelListner;
 
-    public HeadPanel(){
+    public HeadPanel(ArrayList<String> mElectionIDs){
+
+        this.electionIDs = mElectionIDs;
         Dimension dm = getPreferredSize();
         dm.height = 90;
         setPreferredSize(dm);
         setBorder(BorderFactory.createEtchedBorder());
+
 
         //Setting Layout to Null , we Add Components  using setBounds
         setLayout(null);
@@ -49,9 +62,9 @@ public class HeadPanel extends JPanel implements ItemListener, ActionListener {
 
         //Adding Items To Combo Box
         electionsComboBox.addItem("Select");
-        electionsComboBox.addItem("E12523");
-        electionsComboBox.addItem("E11585");
-        electionsComboBox.addItem("E15826");
+        for(String var :electionIDs){
+            electionsComboBox.addItem(var);
+        }
 
 
         //Adding Item Listner to Combo Box
@@ -76,13 +89,8 @@ public class HeadPanel extends JPanel implements ItemListener, ActionListener {
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        String s =(String)e.getItem();
-        if(s.equals("E12523")){
-            electionTitleJlabel.setText("President Election at GKV");
-
-        }
-        else
-            electionTitleJlabel.setText("Election Expired!");
+        currentId = (String) e.getItem();
+        electionTitleJlabel.setText(currentId);
     }
 
 
@@ -92,22 +100,42 @@ public class HeadPanel extends JPanel implements ItemListener, ActionListener {
         JButton clickedBtn = (JButton)e.getSource();
         if(clickedBtn.equals(viewBtn)){
             if(headPanelListner!=null){
-                headPanelListner.ButtonClicked("viewBtn");
+                try {
+                    headPanelListner.ButtonClicked("viewBtn",currentId);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         }
         else if(clickedBtn.equals(printBtn)){
             if(headPanelListner!=null){
-                headPanelListner.ButtonClicked("printBtn");
+                try {
+                    headPanelListner.ButtonClicked("printBtn",currentId);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
 
             }
         }
         else if(clickedBtn.equals(closeBtn)){
             if(headPanelListner!=null){
-                headPanelListner.ButtonClicked("closeBtn");
+                try {
+                    headPanelListner.ButtonClicked("closeBtn",currentId);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         }
     }
     public void setButtonClicked(HeadPanelListner listner){
         this.headPanelListner = listner;
     }
+
 }
+

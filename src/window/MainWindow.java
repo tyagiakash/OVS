@@ -3,18 +3,20 @@ package window;
 import controller.Controller;
 import window.createelection.CreateElection;
 import window.viewelection.ViewElections;
+import window.voter.VoterPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.sql.SQLException;
 
 public class MainWindow extends JFrame {
 
     MenuPanel menuPanel;
     CreateElection createElection;
     ViewElections viewElections;
+    VoterPanel voterPanel;
     JPanel contentPanel;
-
-
 
 
     public MainWindow(){
@@ -48,7 +50,7 @@ public class MainWindow extends JFrame {
         //Getting Data(Button Name) From MenuPanel Event Listner
         menuPanel.setButtonListner(new MenuListner() {
             @Override
-            public void buttonClicked(String btn) {
+            public void buttonClicked(String btn) throws SQLException, IOException {
                 //Checking Which Panel is to Open
                 if(btn.equals("btn1")){
                     //Creating New Instance each time so that Data may be Refreshed..
@@ -58,6 +60,10 @@ public class MainWindow extends JFrame {
                 else if(btn.equals("btn2")){
                     viewElections = new ViewElections();
                     changePanel(viewElections);
+                }
+                else if (btn.equals("btn3")){
+                    voterPanel =new VoterPanel();
+                    changePanel(voterPanel);
                 }
 
             }
