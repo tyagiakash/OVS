@@ -1,17 +1,22 @@
-package window.voter;
+package window.newvoter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.sql.SQLException;
+
 
 /*
   Class for having GUI of New Voter Registration....
  */
 
-public class NewVoterRegistrationPanel extends JPanel {
+public class NewVoterRegistrationPanel extends JPanel implements ActionListener {
 
     //Creating Objects for Various Components Used...
     private JLabel panleTitle;
-    private JLabel voterIdJLabel;
+    private JLabel voterEmailJLabel;
     private JLabel studentRegistrationNoJLabel;
     private JLabel voterNameJlabel;
     private JLabel voterFNameJLabel;
@@ -22,7 +27,7 @@ public class NewVoterRegistrationPanel extends JPanel {
     private JLabel voterMobilNumberJlabel;
     private JLabel voterPhotoJLabel;
 
-    private JTextField voterIdJTextField;
+    private JTextField voterEmailJTextField;
     private JTextField studentRegistrationNoJTextField;
     private JTextField voterNameJTextField;
     private JTextField voterFNameJTextField;
@@ -40,29 +45,35 @@ public class NewVoterRegistrationPanel extends JPanel {
     private JTextField mobileTextField;
 
     private JButton saveBtn;
-    private JButton browseButton;
+    private JButton captureButton;
     private JButton viewPhotoBtn;
+
+    //Creating Instance of ImageIcon for getting Capture Image...
+    private ImageIcon imgIcon;
+
+    //creatin Instance of @NewVoterRegistrationPanelListner
+    private NewVoterRegistrationPanelListner listner;
 
     public NewVoterRegistrationPanel(){
 
         //Initializing Components..
         panleTitle = new JLabel("New Voter Registration");
-        voterIdJLabel = new JLabel("Voter ID:");
-        studentRegistrationNoJLabel = new JLabel("University Registration No:");
+        voterEmailJLabel = new JLabel("Email Id:");
+        studentRegistrationNoJLabel = new JLabel("University Enrollment No:");
         voterNameJlabel = new JLabel("Name:");
         voterFNameJLabel = new JLabel("Father Name:");
         voterGenderJlabel = new JLabel("Gender:");
-        voterCourseJlabel = new JLabel("Coourse:");
+        voterCourseJlabel = new JLabel("Course:");
         studentYearOfAdmissionJlabel = new JLabel("University Year Of Adm.:");
         voterCityJlabel = new JLabel("City:");
         voterMobilNumberJlabel = new JLabel("Mobile No.:");
         voterPhotoJLabel = new JLabel("Upload Photo:");
 
-        voterIdJTextField = new JTextField(13);
-        studentRegistrationNoJTextField = new JTextField(13);
-        studentYearOfAdmtextField = new JTextField(13);
-        voterNameJTextField = new JTextField(13);
-        voterFNameJTextField = new JTextField(13);
+        voterEmailJTextField = new JTextField(15);
+        studentRegistrationNoJTextField = new JTextField(15);
+        studentYearOfAdmtextField = new JTextField(15);
+        voterNameJTextField = new JTextField(15);
+        voterFNameJTextField = new JTextField(15);
         genderBtnGroup = new ButtonGroup();
         maleGenderBtn = new JRadioButton("Male");
         femelGenderBtn = new JRadioButton("Female");
@@ -72,11 +83,11 @@ public class NewVoterRegistrationPanel extends JPanel {
         btechCourseBtn = new JRadioButton("B Tech");
         mtechCourseBtn = new JRadioButton("M Tech");
         artsCourseBtn = new JRadioButton("Arts");
-        cityTextField = new JTextField(13);
-        mobileTextField  = new JTextField(13);
+        cityTextField = new JTextField(15);
+        mobileTextField  = new JTextField(15);
 
         saveBtn = new JButton("Save");
-        browseButton = new JButton("Browse");
+        captureButton = new JButton("Capture");
         viewPhotoBtn = new JButton("View");
 
         //Setup Buttons adding Into Button Groups..
@@ -98,7 +109,7 @@ public class NewVoterRegistrationPanel extends JPanel {
         femelGenderBtn.setActionCommand("female");
         otherGenderBtn.setActionCommand("other");
         mcaCourseBtn.setActionCommand("mca");
-        btechCourseBtn.setActionCommand("bttech");
+        btechCourseBtn.setActionCommand("btech");
         mtechCourseBtn.setActionCommand("mtech");
         artsCourseBtn.setActionCommand("arts");
 
@@ -110,7 +121,7 @@ public class NewVoterRegistrationPanel extends JPanel {
         btechCourseBtn.setFocusPainted(false);
         mtechCourseBtn.setFocusPainted(false);
         artsCourseBtn.setFocusPainted(false);
-        browseButton.setFocusPainted(false);
+        captureButton.setFocusPainted(false);
         viewPhotoBtn.setFocusPainted(false);
         saveBtn.setFocusPainted(false);
 
@@ -134,27 +145,38 @@ public class NewVoterRegistrationPanel extends JPanel {
         horizontalBox2.setBorder(BorderFactory.createEtchedBorder());
 
         Box horizontalBox3 = Box.createHorizontalBox();
-        horizontalBox3.add(browseButton);
+        horizontalBox3.add(captureButton);
         horizontalBox3.add(Box.createHorizontalStrut(7));
         horizontalBox3.add(viewPhotoBtn);
+
+        //Temporary... Adding Colors...
+        Font italicFont = new Font("Roboto", Font.BOLD, 23);
+        panleTitle.setFont(italicFont);
+        panleTitle.setForeground(Color.PINK);
+
+        //Adding Listner to Buttons..
+        captureButton.addActionListener(this);
+        viewPhotoBtn.addActionListener(this);
+        saveBtn.addActionListener(this);
 
 
         //Setting Up Layout for Adding all the components..
         setLayout(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
 
+        //Setting Up lock viewButton @ Starting..
+        viewPhotoBtn.setEnabled(false);
+
         //Desiginign ROW 1
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 1;
-        gc.weighty = 2;
+        gc.weighty = 2.5;
         gc.gridwidth = 2;
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.CENTER;
-        gc.insets = new Insets(0,0,0,60);
+        gc.insets = new Insets(0,20,0,0);
         add(panleTitle,gc);
-
-
 
         //Desiginign ROW 2
         gc.gridx = 0;
@@ -165,12 +187,12 @@ public class NewVoterRegistrationPanel extends JPanel {
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.LINE_END;
         gc.insets = new Insets(0,0,0,10);
-        add(voterIdJLabel,gc);
+        add(voterEmailJLabel,gc);
 
         gc.gridx++;
         gc.anchor = GridBagConstraints.LINE_START;
         gc.insets = new Insets(0,0,0,0);
-        add(voterIdJTextField,gc);
+        add(voterEmailJTextField,gc);
 
         //Desiginign ROW 3
         gc.gridx = 0;
@@ -246,8 +268,6 @@ public class NewVoterRegistrationPanel extends JPanel {
         gc.anchor = GridBagConstraints.LINE_START;
         gc.insets = new Insets(0,0,0,0);
         add(horizontalBox,gc);
-
-
 
         //Desiginign ROW 7
         gc.gridx = 0;
@@ -335,5 +355,96 @@ public class NewVoterRegistrationPanel extends JPanel {
         gc.anchor = GridBagConstraints.LINE_START;
         gc.insets = new Insets(0,0,0,0);
         add(saveBtn,gc);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+          JButton clickedBtn = (JButton)e.getSource();
+          if (clickedBtn.equals(captureButton)){
+
+              //Creating Instance of webCamFrame for Capturing Photo...
+               webcamFrame wf = new webcamFrame();
+
+               //Now Enabling the viewButton
+               viewPhotoBtn.setEnabled(true);
+          }
+          else if (clickedBtn.equals(viewPhotoBtn)){
+
+              //Creating a JLabel for Holding Image on it...
+              JLabel photoLabel = new JLabel();
+
+              //Setting new Icon...
+              imgIcon = new ImageIcon("CapturePhoto/photo.jpg");
+
+              //Setting imgIcon on photoLabel..
+              photoLabel.setIcon(imgIcon);
+
+              //Now Show JoptioPain Having Photo...
+              JOptionPane.showMessageDialog(null,photoLabel,"Photo",JOptionPane.INFORMATION_MESSAGE);
+          }
+          else if (clickedBtn.equals(saveBtn)){
+
+              if (saveBtn.getText().equals("Add More")){
+
+                  saveBtn.setText("Save");
+
+                  //Clearing the Field...
+                  refreshFields();
+
+              }
+              else {
+                  saveBtn.setText("Add More");
+
+                  //Setting Local Variables for getting values of TextFeelds..
+                  String emailId = voterEmailJTextField.getText();
+                  Integer registrationNo =Integer.parseInt(studentRegistrationNoJTextField.getText());
+                  Integer yeraofAdm = Integer.parseInt(studentYearOfAdmtextField.getText());
+                  String name = voterNameJTextField.getText();
+                  String fName = voterFNameJTextField.getText();
+                  String gender = genderBtnGroup.getSelection().getActionCommand();
+                  String course = courseBtnGroup.getSelection().getActionCommand();
+                  String city = cityTextField.getText();
+                  String mobileNo =mobileTextField.getText();
+
+                  /*
+                  Creating object of @NewVoterRegistrationPanel and pass all this above variables
+                  including Event Listner....
+                  */
+
+                  NewVoterRegistrationPanelEvent ev = new NewVoterRegistrationPanelEvent(this,emailId,registrationNo,yeraofAdm,name,fName,gender,course,city,mobileNo);
+
+                  //Calling NewVoterRegistrationPanleListner method and pass this Event on it..
+                  if (listner != null){
+                      try {
+                          listner.newRegistrtionPanelEventOccured(ev);
+                      } catch (FileNotFoundException fileNotFoundException) {
+                          fileNotFoundException.printStackTrace();
+                      } catch (SQLException throwables) {
+                          throwables.printStackTrace();
+                      }
+                  }
+
+              }
+
+          }
+    }
+
+    //Function for Refreshing Data...
+    private void refreshFields(){
+
+        voterEmailJTextField.setText("");
+        studentRegistrationNoJTextField.setText("");
+        studentYearOfAdmtextField.setText("");
+        voterNameJTextField.setText("");
+        voterFNameJTextField.setText("");
+        cityTextField.setText("");
+        mobileTextField.setText("");
+        viewPhotoBtn.setEnabled(false);
+    }
+
+
+    //Setting up NewVoterRegistrationPanelListner as same as pass in VoterPanel..
+    public void setVoterRegistrationPanelListner(NewVoterRegistrationPanelListner listner){
+        this.listner = listner;
     }
 }

@@ -24,7 +24,7 @@ public class Database extends Component {
 
             //Connecting to Db using credntials...
              conn= DriverManager.getConnection(
-                    "jdbc:mysql://sql12.freemysqlhosting.net/sql12380026","sql12380026","l4i2V9CQUr");
+                    "jdbc:mysql://db4free.net/ovsdbms","ovsadmin","12345670");
              System.out.println("Connected Successfuly!!!!!!!");
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Error Occured During Connectio..");
@@ -127,6 +127,7 @@ public class Database extends Component {
         while (rs.next()){
             electionIds.add(rs.getString("ElectionId"));
         }
+        rs.close();
         //Returning the array list of containing all electionId's
         return electionIds;
     }
@@ -178,14 +179,123 @@ public class Database extends Component {
         return arrayOfData;
     }
 
+    /*
+    Function for Gettting all the data from NewVoterRegsitrationPanel through VoterPanel and Controller
+    and add this to DB and return voterId from the Db...
+     */
+
+    public void addVoterDetailsToDB(String emailId,Integer registrationNO,Integer yOADM,String name, String fName,String gender,String course,String city,String mobile) throws SQLException, FileNotFoundException {
+
+        try {
+            //Variablle for Storring VotersID return by Database...
+            String voterId = null;
+
+            //Converting Images to byte..
+            InputStream iPhoto = new FileInputStream(new File("CapturePhoto/photo.jpg"));
+
+            //Making  Query for Adding all the data......
+            String query = "insert into Voters(EmailId,EnrollmentNo,AdmissionYear,Name,FName,Gender,Course,City,Mobile,Photo)" + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            // create the mysql insert preparedstatement
+            PreparedStatement preparedStmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            preparedStmt.setString(1, emailId);
+            preparedStmt.setInt(2, registrationNO);
+            preparedStmt.setInt(3, yOADM);
+            preparedStmt.setString(4, name);
+            preparedStmt.setString(5, fName);
+            preparedStmt.setString(6, gender);
+            preparedStmt.setString(7, course);
+            preparedStmt.setString(8,city);
+            preparedStmt.setString(9, mobile);
+            preparedStmt.setBlob(10, iPhoto);
+
+
+            // execute the preparedstatement
+            preparedStmt.execute();
+
+            //Creating instamce of ResultSet to get VoterId from User...
+            ResultSet rs = preparedStmt.getGeneratedKeys();
+            while (rs.next()) {
+                voterId = "OVS" + rs.getInt(1);
+            }
+            rs.close();
+
+            //Generating Pop Up for Successfully Update data And Print returning Voter Id ...
+            JOptionPane.showMessageDialog(null, "Voter ID:" + voterId, "Successfully Saved!!", JOptionPane.INFORMATION_MESSAGE);
+        }
+        catch (Exception e){
+            JOptionPane.showMessageDialog(null,e,"Error Occured!",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    //Function for Searching a record of voter and return deatails for the same...
+    public UpdateVoter searchVoterToDB(String id,String type) throws SQLException, IOException {
+
+        String query = "Select * FROM Voters WHERE "+type+" = "+id;
+        UpdateVoter temp = null;
+
+        // Create statement object..
+        Statement stmt = conn.createStatement();
+
+        // execute the preparedstatement and save to ResultSet ob..
+        ResultSet rs = stmt.executeQuery(query);
+
+        while (rs.next()) {
+            String voterName = rs.getString("Name");
+            Integer voterId = rs.getInt("VoterId");
+            String city = rs.getString("City");
+            String mobileNumber = rs.getString("Mobile");
+            String course = rs.getString("Course");
+            Blob voterPhoto = rs.getBlob("Photo");
+
+            ImageIcon photoIcon = convertImage(voterPhoto);
+
+            temp = new UpdateVoter(voterName,voterId,city,mobileNumber,course,photoIcon);
+        }
+        return temp;
+    }
+    /*
+    Function to Update Voter Data Back to DB...
+     */
+
+    public int UpdateVoterDataToDB(UpdateVoter voterData) throws FileNotFoundException, SQLException {
+
+        if (voterData.getPhotoUpdated()){
+
+            //Converting Images to byte..
+            InputStream iPhoto = new FileInputStream(new File("CapturePhoto/photo.jpg"));
+
+            PreparedStatement update = conn.prepareStatement
+                    ("UPDATE Voters SET City = ?, Course = ?, Mobile = ?, Photo = ? WHERE VoterId = ?");
+
+            update.setString(1, voterData.getCity());
+            update.setString(2, voterData.getCourse());
+            update.setString(3, voterData.getMobileNumber());
+            update.setBlob(4,iPhoto);
+            update.setInt(5,voterData.getVoterId());
+            update.executeUpdate();
+            return 1;
+        }
+        else {
+            PreparedStatement update = conn.prepareStatement
+                    ("UPDATE Voters SET City = ?, Course = ?, Mobile = ? WHERE VoterId = ?");
+
+            update.setString(1, voterData.getCity());
+            update.setString(2, voterData.getCourse());
+            update.setString(3, voterData.getMobileNumber());
+            update.setInt(4,voterData.getVoterId());
+            update.executeUpdate();
+            return 1;
+        }
+    }
+
     //Functionn to convert A Blob object to Buffered Image and resize it
     private ImageIcon convertImage(Blob b) throws SQLException, IOException {
         BufferedImage bufferedImage;
         InputStream inputStream = b.getBinaryStream(1,b.length());
         bufferedImage = ImageIO.read(inputStream);
         Image tImage = (Image)bufferedImage;
-        Image modifiedImgIcon = tImage.getScaledInstance(100,100,Image.SCALE_SMOOTH);
+        Image modifiedImgIcon = tImage.getScaledInstance(120,120,Image.SCALE_SMOOTH);
         return new ImageIcon(modifiedImgIcon);
     }
-
 }

@@ -2,9 +2,12 @@ package controller;
 
 import model.Database;
 import model.ElectionDetailsPrintData;
+import model.UpdateVoter;
 import window.createelection.CandidateFormPanelEvent;
 import window.createelection.FormPanelEvent;
+import window.newvoter.NewVoterRegistrationPanelEvent;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,9 +17,12 @@ import java.util.ArrayList;
 public class Controller {
 
     //Creating Instance of @Database
-    Database db = new Database();
+    private Database db = new Database();
 
-    //Function For Getting Data From @CreateElection ->FormPanel
+    //Creating instance of UpdateVoter Model..
+    private UpdateVoter temp;
+
+    //Function For Getting Data From @CreateElection  <---  FormPanel
     public void addElectionDetails(FormPanelEvent ev) throws SQLException {
         String id = ev.getId();
         String title = ev.getTitle();
@@ -58,5 +64,37 @@ public class Controller {
     //database and send  to ViewElection
      public  ArrayList<ElectionDetailsPrintData> getPrintableElectionDataFromDB(String searchEid) throws IOException, SQLException {
        return db.getPrintableElectionData(searchEid);
+    }
+
+    /*
+    Function for Getting All Voters Data from VoterPanel <---  NewVoterRegistrationPanel...
+     */
+    public void addVoterDetails(NewVoterRegistrationPanelEvent ev) throws FileNotFoundException, SQLException {
+
+        //Variables for Storing Data...
+        String emailId = ev.getEmailId() ;
+        Integer registrationNo = ev.getRegistrationNo();
+        Integer yeraofAdm = ev.getYeraofAdm();
+        String name = ev.getName();
+        String fName = ev.getfName();
+        String gender = ev.getGender();
+        String course = ev.getCourse();
+        String city = ev.getCity();
+        String mobileNo = ev.getMobileNo();
+
+        db.createConnection();
+        db.addVoterDetailsToDB(emailId,registrationNo,yeraofAdm,name,fName,gender,course,city,mobileNo);
+    }
+
+    /*
+    Function for searching a result in databse if it is availabe then we can update it
+     */
+    public UpdateVoter searchVoter(String id, String type) throws SQLException, IOException {
+        db.createConnection();
+        temp = db.searchVoterToDB(id,type);
+        return  temp;
+    }
+    public int updateVoterData() throws FileNotFoundException, SQLException {
+       return db.UpdateVoterDataToDB(temp);
     }
 }

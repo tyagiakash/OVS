@@ -25,7 +25,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         //Set layout to Grid Layout
         setLayout(new GridLayout(0,1,0,15));
 
-        //Setting Up Width of the MenuPanel
+        //Setting Up Width of the MenuPanelNewVoter
         Dimension dim = getPreferredSize();
         dim.width = 190;
         setPreferredSize(dim);
@@ -42,8 +42,8 @@ public class MenuPanel extends JPanel implements ActionListener {
         //Initialization of  the  Buttons
         btn1 = new JButton("Create Election");
         btn2 = new JButton("View Elections");
-        btn3 = new JButton("Voter");
-        btn4 = new JButton("Four");
+        btn3 = new JButton("New Voter");
+        btn4 = new JButton("Update Voter");
         btn5 = new JButton("Five");
         btn6 = new JButton("Six");
 

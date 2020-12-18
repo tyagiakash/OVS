@@ -50,14 +50,14 @@ public class PrintableForm extends JPanel {
 
 
         //Initializing Components
-        electionDetailsLabelH = new JLabel("Election Details: ");
+        electionDetailsLabelH = new JLabel("Election Details:");
         headingLabel = new JLabel("Online Voting System(OVS)");
         electionIdLabelH = new JLabel("Election ID:");
-        electionTitleLabelH = new JLabel("Election Title: ");
-        placeLabelH = new JLabel("Place :");
-        dateLabelH = new JLabel("Date: ");
-        eligiblityLabelH =new JLabel("Eligiblity: ");
-        candidateDetailsH = new JLabel("Candidate Details: ");
+        electionTitleLabelH = new JLabel("Election Title:");
+        placeLabelH = new JLabel("Place:");
+        dateLabelH = new JLabel("Date:");
+        eligiblityLabelH =new JLabel("Eligiblity:");
+        candidateDetailsH = new JLabel("Candidate Details:");
         //cHeadingPanel is Border small layout that feels like a table Header...
         cHeadingPanel = new CandidateDetailsHeadingsPanel();
 

@@ -1,9 +1,9 @@
 package window;
 
-import controller.Controller;
 import window.createelection.CreateElection;
+import window.updatevoter.UpdateVoterPanel;
 import window.viewelection.ViewElections;
-import window.voter.VoterPanel;
+import window.newvoter.VoterPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,11 +12,12 @@ import java.sql.SQLException;
 
 public class MainWindow extends JFrame {
 
-    MenuPanel menuPanel;
-    CreateElection createElection;
-    ViewElections viewElections;
-    VoterPanel voterPanel;
-    JPanel contentPanel;
+    private MenuPanel menuPanel;
+    private CreateElection createElection;
+    private ViewElections viewElections;
+    private VoterPanel voterPanel;
+    private UpdateVoterPanel updateVoterPanel;
+    private JPanel contentPanel;
 
 
     public MainWindow(){
@@ -47,7 +48,7 @@ public class MainWindow extends JFrame {
         //Setting Visiblity of Frame
         setVisible(true);
 
-        //Getting Data(Button Name) From MenuPanel Event Listner
+        //Getting Data(Button Name) From MenuPanelNewVoter Event Listner
         menuPanel.setButtonListner(new MenuListner() {
             @Override
             public void buttonClicked(String btn) throws SQLException, IOException {
@@ -64,6 +65,10 @@ public class MainWindow extends JFrame {
                 else if (btn.equals("btn3")){
                     voterPanel =new VoterPanel();
                     changePanel(voterPanel);
+                }
+                else if (btn.equals("btn4")){
+                    updateVoterPanel = new UpdateVoterPanel();
+                    changePanel(updateVoterPanel);
                 }
 
             }

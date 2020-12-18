@@ -1,19 +1,19 @@
-package window.voter;
+package window.newvoter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MenuPanel extends JPanel implements ActionListener {
+public class MenuPanelNewVoter extends JPanel implements ActionListener {
     private final JButton newBtn;
-    private final JButton updateBtn;
+    private final JButton searchBtn;
     private final JButton closeBtn;
 
     //Creating instance of MenuPanelLitner..
     MenuPanelListner listner;
 
-    public MenuPanel(){
+    public MenuPanelNewVoter(){
 
         //Setting Up Height of the panel and giving a border to it..
         Dimension dm = getPreferredSize();
@@ -26,27 +26,27 @@ public class MenuPanel extends JPanel implements ActionListener {
 
         //Initializing  Componentts...
         newBtn = new  JButton("New Voter");
-        updateBtn = new JButton("Update Voter");
+        searchBtn = new JButton("Search Voter");
         closeBtn = new JButton("Close");
 
         //Adding theses Buttons to Layout..
         add(newBtn);
-        add(updateBtn);
+        add(searchBtn);
         add(closeBtn);
 
         //Setting Their  positions to the layout..
-        newBtn.setBounds(25,9,120,26);
-        updateBtn.setBounds(270,9,130,26);
+        searchBtn.setBounds(10,9,130,26);
+        newBtn.setBounds(255,9,130,26);
         closeBtn.setBounds(515,9,80,26);
 
         //Remove text Focus form Buttons...
         newBtn.setFocusPainted(false);
-        updateBtn.setFocusPainted(false);
+        searchBtn.setFocusPainted(false);
         closeBtn.setFocusPainted(false);
 
         //Setting ActionListner to the buttons...
         newBtn.addActionListener(this);
-        updateBtn.addActionListener(this);
+        searchBtn.addActionListener(this);
         closeBtn.addActionListener(this);
 
 
@@ -59,7 +59,7 @@ public class MenuPanel extends JPanel implements ActionListener {
        if (clickedBtn.equals(newBtn)){
            listner.setMenuPanelListnerBtn("newVoter");
        }
-       else if (clickedBtn.equals(updateBtn)){
+       else if (clickedBtn.equals(searchBtn)){
            listner.setMenuPanelListnerBtn("updateVoter");
        }
        else if (clickedBtn.equals(closeBtn)){
@@ -68,7 +68,7 @@ public class MenuPanel extends JPanel implements ActionListener {
 
     }
 
-    //Setting MenuPanel Listner to this class as same as in VoterPanel Class...
+    //Setting MenuPanelNewVoter Listner to this class as same as in VoterPanel Class...
     public void setMenuPanelListner(MenuPanelListner listner){
         this.listner = listner;
     }

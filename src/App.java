@@ -1,5 +1,6 @@
 import login.MainFrame;
 import model.Database;
+import window.searchvoter.SearchFrame;
 
 import java.sql.SQLException;
 
@@ -7,7 +8,8 @@ import java.sql.SQLException;
 public class App {
     public static void main(String[] args) throws SQLException {
         //Creating  Instance of Login Frame
-////        new MainFrame();
+//        new MainFrame();
         new window.MainWindow();
+//        new SearchFrame();
     }
 }

@@ -35,5 +35,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="webcam-Capture" level="project" />
+    <orderEntry type="library" name="src" level="project" />
   </component>
 </module>
