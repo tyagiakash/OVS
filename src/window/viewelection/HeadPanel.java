@@ -1,5 +1,7 @@
 package window.viewelection;
 
+import model.ElectionId;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,7 +23,7 @@ public class HeadPanel extends JPanel implements ItemListener, ActionListener {
 
 
     //Creating a Array List of ElectionID's
-    private ArrayList<String> electionIDs;
+    private ArrayList<ElectionId> electionIDs;
 
     //String Variable for Storing Current element Selected in JComboBox..
     private String currentId =  "Select";
@@ -29,7 +31,7 @@ public class HeadPanel extends JPanel implements ItemListener, ActionListener {
     //Creating Instnce of HeadPanelListener
     private HeadPanelListner headPanelListner;
 
-    public HeadPanel(ArrayList<String> mElectionIDs){
+    public HeadPanel(ArrayList<ElectionId> mElectionIDs){
 
         this.electionIDs = mElectionIDs;
         Dimension dm = getPreferredSize();
@@ -62,10 +64,9 @@ public class HeadPanel extends JPanel implements ItemListener, ActionListener {
 
         //Adding Items To Combo Box
         electionsComboBox.addItem("Select");
-        for(String var :electionIDs){
-            electionsComboBox.addItem(var);
+        for(int i =0;i<electionIDs.size();i++){
+            electionsComboBox.addItem(electionIDs.get(i).getElectionId());
         }
-
 
         //Adding Item Listner to Combo Box
         electionsComboBox.addItemListener(this);
@@ -90,7 +91,13 @@ public class HeadPanel extends JPanel implements ItemListener, ActionListener {
     @Override
     public void itemStateChanged(ItemEvent e) {
         currentId = (String) e.getItem();
-        electionTitleJlabel.setText(currentId);
+        for (int i=0;i<electionIDs.size();i++){
+            if (currentId.equals(electionIDs.get(i).getElectionId())){
+                electionTitleJlabel.setText(electionIDs.get(i).getElectionTitle());
+                break;
+            }
+        }
+
     }
 
 

@@ -1,8 +1,6 @@
 package controller;
 
-import model.Database;
-import model.ElectionDetailsPrintData;
-import model.UpdateVoter;
+import model.*;
 import window.createelection.CandidateFormPanelEvent;
 import window.createelection.FormPanelEvent;
 import window.newvoter.NewVoterRegistrationPanelEvent;
@@ -52,7 +50,7 @@ public class Controller {
     }
 
     //Method for Getting Election Id's form the Database...
-    public ArrayList<String> getElectionIdFromDB() throws SQLException {
+    public ArrayList<ElectionId> getElectionIdFromDB() throws SQLException {
         //Creating Connection With DB and getting Result through Database Class...
         db.createConnection();
         return  db.getElectionIdsFromDB();
@@ -94,7 +92,17 @@ public class Controller {
         temp = db.searchVoterToDB(id,type);
         return  temp;
     }
+
+    //Method for Updating Voter Data Back to Db
     public int updateVoterData() throws FileNotFoundException, SQLException {
        return db.UpdateVoterDataToDB(temp);
     }
+
+    //Method for Inserting Data Into Eligiblity table from Eligiblity Panel..
+    public int addEligibilityData(String electionId, Boolean allCandidates, Integer startingYear, Integer endingYear, Boolean isMCAselected, Boolean isBtechSelected, Boolean isMtechSelected, Boolean isArtsSelected) throws SQLException {
+        EligibilityData dat = new EligibilityData(electionId,allCandidates,startingYear,endingYear,isMCAselected,isBtechSelected,isMtechSelected,isArtsSelected);
+        db.createConnection();
+        return db.addEligibilityDataToDB(dat);
+    }
+
 }

@@ -109,13 +109,13 @@ public class Database extends Component {
     }
 
     //Function for Getting all Election Id's from Database...
-    public ArrayList<String> getElectionIdsFromDB() throws SQLException {
+    public ArrayList<ElectionId> getElectionIdsFromDB() throws SQLException {
 
         //Creating array list to store fetched ID's from Database..
-        ArrayList<String> electionIds = new ArrayList<String>();
+        ArrayList<ElectionId> electionIds = new ArrayList<ElectionId>();
 
         //Making  Query for Getting  all the ElectionID's......
-        String query = "SELECT `ElectionId` FROM `ElectionDetails` WHERE 1";
+        String query = "SELECT `ElectionId`,`ElectionTitle` FROM `ElectionDetails` WHERE 1";
 
         // Create statement object..
         Statement stmt = conn.createStatement();
@@ -125,7 +125,11 @@ public class Database extends Component {
 
         //Adding all ElectionId's to the array List...
         while (rs.next()){
-            electionIds.add(rs.getString("ElectionId"));
+            String id = rs.getString("ElectionId");
+            String title = rs.getString("ElectionTitle");
+
+            ElectionId temp = new ElectionId(id,title);
+            electionIds.add(temp);
         }
         rs.close();
         //Returning the array list of containing all electionId's
@@ -285,6 +289,35 @@ public class Database extends Component {
             update.setString(3, voterData.getMobileNumber());
             update.setInt(4,voterData.getVoterId());
             update.executeUpdate();
+            return 1;
+        }
+    }
+
+    /*
+    Method for inserting data into Eligibility Table from Eligibility Panel..
+     */
+
+    public int addEligibilityDataToDB(EligibilityData data) throws SQLException {
+        if (data.getAllCandidates()){
+            String querry = "INSERT INTO Eligibility(ElectionId,AllCandidates)" + " values (?,?)";
+            PreparedStatement preparedStatement = conn.prepareStatement(querry);
+            preparedStatement.setString(1,data.getElectionId());
+            preparedStatement.setBoolean(2,true);
+            preparedStatement.execute();
+            return 1;
+        }
+        else {
+            String querry = "INSERT INTO Eligibility(ElectionId,AllCandidates,StartingYear,EndingYear,MCA,BTech,MTech,Arts)" + " values (?,?,?,?,?,?,?,?)";
+            PreparedStatement stmt = conn.prepareStatement(querry);
+            stmt.setString(1,data.getElectionId());
+            stmt.setBoolean(2,false);
+            stmt.setInt(3,data.getStartingYear());
+            stmt.setInt(4,data.getEndingYear());
+            stmt.setBoolean(5,data.getMCAselected());
+            stmt.setBoolean(6,data.getBtechSelected());
+            stmt.setBoolean(7,data.getMtechSelected());
+            stmt.setBoolean(8,data.getArtsSelected());
+            stmt.execute();
             return 1;
         }
     }

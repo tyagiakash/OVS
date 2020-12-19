@@ -1,6 +1,7 @@
 package window;
 
 import window.createelection.CreateElection;
+import window.eligiblity.EligibilityPanel;
 import window.updatevoter.UpdateVoterPanel;
 import window.viewelection.ViewElections;
 import window.newvoter.VoterPanel;
@@ -17,6 +18,7 @@ public class MainWindow extends JFrame {
     private ViewElections viewElections;
     private VoterPanel voterPanel;
     private UpdateVoterPanel updateVoterPanel;
+    private EligibilityPanel eligibilityPanel;
     private JPanel contentPanel;
 
 
@@ -69,6 +71,10 @@ public class MainWindow extends JFrame {
                 else if (btn.equals("btn4")){
                     updateVoterPanel = new UpdateVoterPanel();
                     changePanel(updateVoterPanel);
+                }
+                else if (btn.equals("btn5")){
+                    eligibilityPanel = new EligibilityPanel();
+                    changePanel(eligibilityPanel);
                 }
 
             }

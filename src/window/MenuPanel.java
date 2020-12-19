@@ -44,7 +44,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         btn2 = new JButton("View Elections");
         btn3 = new JButton("New Voter");
         btn4 = new JButton("Update Voter");
-        btn5 = new JButton("Five");
+        btn5 = new JButton("Eligibility");
         btn6 = new JButton("Six");
 
 
@@ -108,38 +108,46 @@ public class MenuPanel extends JPanel implements ActionListener {
         }
         else if(clicked == btn3){
             if(menuListner!=null){
+                setButtonColor();
                 try {
                     menuListner.buttonClicked("btn3");
                 } catch (SQLException | IOException throwables) {
                     throwables.printStackTrace();
                 }
+                btn3.setBackground(Color.MAGENTA);
             }
         }
         else if(clicked == btn4){
             if(menuListner!=null){
+                setButtonColor();
                 try {
                     menuListner.buttonClicked("btn4");
                 } catch (SQLException | IOException throwables) {
                     throwables.printStackTrace();
                 }
+                btn4.setBackground(Color.MAGENTA);
             }
         }
         else if(clicked == btn5){
             if(menuListner!=null){
+                setButtonColor();
                 try {
                     menuListner.buttonClicked("btn5");
                 } catch (SQLException | IOException throwables) {
                     throwables.printStackTrace();
                 }
+                btn5.setBackground(Color.MAGENTA);
             }
         }
         else if(clicked == btn6){
             if(menuListner!=null){
+                setButtonColor();
                 try {
                     menuListner.buttonClicked("btn6");
                 } catch (SQLException | IOException throwables) {
                     throwables.printStackTrace();
                 }
+                btn6.setBackground(Color.MAGENTA);
             }
         }
 
