@@ -136,6 +136,35 @@ public class Database extends Component {
         return electionIds;
     }
 
+    //Method for Generating all election id's Whose eligiblity equals to none.. for ElectionDetails..
+    //Function for Getting all Election Id's from Database...
+    public ArrayList<ElectionId> getElectionIdsForNonEligiblityFromDB() throws SQLException {
+
+        //Creating array list to store fetched ID's from Database..
+        ArrayList<ElectionId> electionIds = new ArrayList<ElectionId>();
+
+        //Making  Query for Getting  all the ElectionID's......
+        String query = "SELECT `ElectionId` , 'ElectionTitle' FROM ElectionDetails WHERE eligibilityElection = 'none'";
+
+        // Create statement object..
+        Statement stmt = conn.createStatement();
+
+        // execute the preparedstatement and save to ResultSet ob..
+        ResultSet rs = stmt.executeQuery(query);
+
+        //Adding all ElectionId's to the array List...
+        while (rs.next()){
+            String id = rs.getString("ElectionId");
+            String title = rs.getString("ElectionTitle");
+
+            ElectionId temp = new ElectionId(id,title);
+            electionIds.add(temp);
+        }
+        rs.close();
+        //Returning the array list of containing all electionId's
+        return electionIds;
+    }
+
     //Create Function for Getting all details from Election Details and
     //Candidate Detls Tables form Database... and it return araayList of ElectionDetailsPrintData
     public  ArrayList<ElectionDetailsPrintData> getPrintableElectionData(String searchEid) throws SQLException, IOException {
@@ -147,7 +176,7 @@ public class Database extends Component {
 
         //Making  Query for Getting  all the Columns of ElectionDetails
         // and Candidate table Columns's...... of specific ElectionId...
-        String query = "SELECT * FROM ElectionDetails INNER JOIN CandidateDetails ON ElectionDetails.ElectionId = CandidateDetails.ElectionId " +
+        String query = "SELECT * FROM ElectionDetails INNER JOIN CandidateDetails ON ElectionDetails.ElectionId = CandidateDetails.ElectionId  " +
                 "WHERE ElectionDetails.ElectionId ="+ "'" + searchEid +"'";
 
         // Create statement object..
@@ -171,13 +200,14 @@ public class Database extends Component {
               String cDetails = rs.getString("Details");
               Blob cPhoto = rs.getBlob("Photo");
               Blob cSymbol = rs.getBlob("Symbol");
+              String ele = rs.getString("eligibilityElection");
 
               ImageIcon photoIcon = convertImage(cPhoto);
               ImageIcon symbolIcon = convertImage(cSymbol);
 
               //Creating a temporary object of ElectionDetailsPrint Data Model
               // and add this to the arrayList of same type for multiple rows
-              ElectionDetailsPrintData temp = new ElectionDetailsPrintData(eID,eTitle,tCandidates,ePlace,eDate,cID,cName,cDetails,photoIcon,symbolIcon);
+              ElectionDetailsPrintData temp = new ElectionDetailsPrintData(eID,eTitle,tCandidates,ePlace,eDate,cID,cName,cDetails,photoIcon,symbolIcon,ele);
               arrayOfData.add(temp);
         }
         return arrayOfData;
@@ -298,13 +328,14 @@ public class Database extends Component {
      */
 
     public int addEligibilityDataToDB(EligibilityData data) throws SQLException {
+
+
         if (data.getAllCandidates()){
             String querry = "INSERT INTO Eligibility(ElectionId,AllCandidates)" + " values (?,?)";
             PreparedStatement preparedStatement = conn.prepareStatement(querry);
             preparedStatement.setString(1,data.getElectionId());
             preparedStatement.setBoolean(2,true);
             preparedStatement.execute();
-            return 1;
         }
         else {
             String querry = "INSERT INTO Eligibility(ElectionId,AllCandidates,StartingYear,EndingYear,MCA,BTech,MTech,Arts)" + " values (?,?,?,?,?,?,?,?)";
@@ -318,8 +349,17 @@ public class Database extends Component {
             stmt.setBoolean(7,data.getMtechSelected());
             stmt.setBoolean(8,data.getArtsSelected());
             stmt.execute();
-            return 1;
         }
+
+        //Also inserting Eligibility to the Election Details table...
+        PreparedStatement update = conn.prepareStatement
+                ("UPDATE ElectionDetails SET eligibilityElection = ? WHERE ElectionId = ?");
+
+        update.setString(1, data.getSingleEligibilityString());
+        update.setString(2,data.getElectionId());
+        update.executeUpdate();
+
+        return 1;
     }
 
     //Functionn to convert A Blob object to Buffered Image and resize it

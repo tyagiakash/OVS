@@ -67,8 +67,15 @@ public class PrintableForm extends JPanel {
         electionTitleLabel = new JLabel(arrayofData.get(0).getElectionTitle());
         placeLabel = new JLabel(arrayofData.get(0).getPlace());
         dateLabel = new JLabel(arrayofData.get(0).getDate());
-        eligiblityLabel =new JLabel("All Students");
+        eligiblityLabel =new JLabel();
 
+        //Setting Eligiblity if there is not none in column..
+        if (arrayofData.get(0).getEligibility().equals("none")){
+            eligiblityLabel.setText("Eligibility Not Selected for This Election Yet.");
+            eligiblityLabel.setForeground(Color.RED);
+        }
+        else
+            eligiblityLabel.setText(arrayofData.get(0).getEligibility());
 
         setLayout(new GridBagLayout());
         setBackground(Color.decode("#ffffff"));

@@ -16,8 +16,10 @@ public class ElectionDetailsPrintData {
     private String candidateDetails;
     private ImageIcon candidatePhoto;
     private ImageIcon electionSymbolPhoto;
+    private String eligibility;
 
-    public ElectionDetailsPrintData(String electionId ,String electionTitle , Integer totalCandidates,String place,String date ,Integer candidateId ,String candidateName , String candidateDetails,ImageIcon photo,ImageIcon symbol){
+
+    public ElectionDetailsPrintData(String electionId ,String electionTitle , Integer totalCandidates,String place,String date ,Integer candidateId ,String candidateName , String candidateDetails,ImageIcon photo,ImageIcon symbol,String eligibility){
         this.electionId = electionId;
         this.electionTitle = electionTitle;
         this.totalCandidates = totalCandidates;
@@ -28,6 +30,8 @@ public class ElectionDetailsPrintData {
         this.candidateDetails = candidateDetails;
         this.candidatePhoto = photo;
         this.electionSymbolPhoto = symbol;
+        this.eligibility = eligibility;
+
     }
 
     //Getters and Setters  for all the Variables...
@@ -111,5 +115,9 @@ public class ElectionDetailsPrintData {
 
     public void setElectionSymbolPhoto(ImageIcon electionSymbolPhoto) {
         this.electionSymbolPhoto = electionSymbolPhoto;
+    }
+
+    public String getEligibility() {
+        return eligibility;
     }
 }

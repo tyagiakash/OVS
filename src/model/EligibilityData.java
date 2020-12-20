@@ -10,6 +10,7 @@ public class EligibilityData {
     private Boolean isBtechSelected;
     private Boolean isMtechSelected;
     private Boolean isArtsSelected;
+    private String singleEligibilityString;
 
     public String getElectionId() {
         return electionId;
@@ -43,7 +44,11 @@ public class EligibilityData {
         return isArtsSelected;
     }
 
-    public EligibilityData(String electionId, Boolean allCandidates, Integer startingYear, Integer endingYear, Boolean isMCAselected, Boolean isBtechSelected, Boolean isMtechSelected, Boolean isArtsSelected){
+    public String getSingleEligibilityString() {
+        return singleEligibilityString;
+    }
+
+    public EligibilityData(String electionId, Boolean allCandidates, Integer startingYear, Integer endingYear, Boolean isMCAselected, Boolean isBtechSelected, Boolean isMtechSelected, Boolean isArtsSelected, String singleEligibilityString){
         this.electionId = electionId;
         this.allCandidates = allCandidates;
         this.startingYear = startingYear;
@@ -52,6 +57,7 @@ public class EligibilityData {
         this.isBtechSelected = isBtechSelected;
         this.isMtechSelected = isMtechSelected;
         this.isArtsSelected = isArtsSelected;
+        this.singleEligibilityString = singleEligibilityString;
     }
 
     //Creating Getters for these Variables...

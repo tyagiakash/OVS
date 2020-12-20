@@ -27,10 +27,10 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
     private JRadioButton filterRadioBtn;
     private ButtonGroup btnGroup;
     private JLabel allLabel;
-    private JLabel yearofAdmLabel;
+    private JCheckBox yearofAdmCBox;
     private JComboBox<Integer> startingYearCBox;
     private JComboBox<Integer> endingYearCBox;
-    private JLabel courselabel;
+    private JCheckBox courseCBox;
     private JCheckBox mcaCB,btechCB,mtechCB,artsCB;
     private JButton saveBtn;
 
@@ -47,6 +47,8 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
     private Boolean isBtechChecked = false;
     private Boolean isMtechChecked = false;
     private Boolean isArtsChecked = false;
+    private Boolean isCourseCBoxChecked = false;
+    private Boolean isYearOfAdmCBoxChecked = false;
     private String currentElectionId;
 
     public EligibilityPanel() throws SQLException {
@@ -55,7 +57,7 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         setLayout(new BorderLayout());
 
         //Getting Election Ids Frorm Db via Controller..
-        electionIDs = controller.getElectionIdFromDB();
+        electionIDs = controller.getElectionIdForNonEligiblityFromDB();
 
         //Initializing Jpanel Components
         headPanel = new JPanel();
@@ -70,7 +72,7 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         allLabel = new JLabel("* Allowing all Candidates...");
         filterRadioBtn = new JRadioButton("Filter Candidates");
         btnGroup = new ButtonGroup();
-        yearofAdmLabel = new JLabel("* Based On Year of Adm.:");
+        yearofAdmCBox = new JCheckBox("* Based On Year of Adm.:");
         startingYearCBox = new JComboBox<>();
         startingYearCBox.addItem(2017);
         startingYearCBox.addItem(2018);
@@ -86,7 +88,7 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         endingYearCBox.addItem(2023);
         endingYearCBox.addItem(2024);
         endingYearCBox.addItem(2025);
-        courselabel = new JLabel("* Based On Courses:");
+        courseCBox = new JCheckBox("* Based On Courses:");
         mcaCB = new JCheckBox("MCA");
         btechCB = new JCheckBox("Btech");
         mtechCB = new JCheckBox("MTech");
@@ -107,16 +109,21 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         btechCB.setFocusPainted(false);
         mtechCB.setFocusPainted(false);
         artsCB.setFocusPainted(false);
+        courseCBox.setFocusPainted(false);
+        yearofAdmCBox.setFocusPainted(false);
 
         //Selection By Default AllCAndidates selected and filter components disabled..
         allRadioBtn.setSelected(true);
         EnableDisable(false);
+        yearofAdmCBox.setEnabled(false);
+        courseCBox.setEnabled(false);
 
         //Adding action Listners on All Radio Button....
         allRadioBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                EnableDisable(false);
+                yearofAdmCBox.setEnabled(false);
+                courseCBox.setEnabled(false);
             }
         });
 
@@ -124,7 +131,8 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         filterRadioBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                EnableDisable(true);
+                yearofAdmCBox.setEnabled(true);
+                courseCBox.setEnabled(true);
             }
         });
 
@@ -183,6 +191,44 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         btechCB.addItemListener(this);
         mtechCB.addItemListener(this);
         artsCB.addItemListener(this);
+
+        //Adding Listner to YearofAdmCBox..
+        yearofAdmCBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+
+                if (yearofAdmCBox.isSelected()) {
+                    isYearOfAdmCBoxChecked = true;
+                    startingYearCBox.setEnabled(true);
+                    endingYearCBox.setEnabled(true);
+                }
+                else {
+                    startingYearCBox.setEnabled(false);
+                    endingYearCBox.setEnabled(false);
+                }
+            }
+        });
+
+        //Adding Listner to CourseCheckBox..
+        courseCBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+
+                if (courseCBox.isSelected()) {
+                    isCourseCBoxChecked = true;
+                    mcaCB.setEnabled(true);
+                    btechCB.setEnabled(true);
+                    mtechCB.setEnabled(true);
+                    artsCB.setEnabled(true);
+                }
+                else {
+                    mcaCB.setEnabled(false);
+                    btechCB.setEnabled(false);
+                    mtechCB.setEnabled(false);
+                    artsCB.setEnabled(false);
+                }
+            }
+        });
 
 
         headPanel.setPreferredSize(new Dimension(0,90));
@@ -277,7 +323,7 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.LINE_START;
         gc.insets = new Insets(0,60,0,0);
-        contentPanel.add(yearofAdmLabel,gc);
+        contentPanel.add(yearofAdmCBox,gc);
 
         gc.gridx++;
         gc.anchor = GridBagConstraints.LINE_START;
@@ -293,7 +339,7 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.LINE_START;
         gc.insets = new Insets(0,60,0,0);
-        contentPanel.add(courselabel,gc);
+        contentPanel.add(courseCBox,gc);
 
         gc.gridx++;
         gc.anchor = GridBagConstraints.LINE_START;
@@ -327,11 +373,13 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
     public void actionPerformed(ActionEvent e) {
         JButton btn = (JButton) e.getSource();
         if (btn.equals(saveBtn)){
+
+            String temp = eligibilityGenerator();
             //First Check Whether Criteria is All or Filtered and then send data to controller..
             if (filterRadioBtn.isSelected()){
                 Integer check = null;
                 try {
-                    check = controller.addEligibilityData(currentElectionId,false,startingYear,endingYear,isMCAChecked,isBtechChecked,isMtechChecked,isArtsChecked);
+                    check = controller.addEligibilityData(currentElectionId,false,startingYear,endingYear,isMCAChecked,isBtechChecked,isMtechChecked,isArtsChecked,temp);
 
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
@@ -345,7 +393,7 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
                 System.out.println("All");
                 Integer check = null;
                 try {
-                    check = controller.addEligibilityData(currentElectionId,true,null,null,false,false,false,false);
+                    check = controller.addEligibilityData(currentElectionId,true,null,null,false,false,false,false,temp);
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -366,4 +414,44 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         mtechCB.setEnabled(b);
         artsCB.setEnabled(b);
     }
+
+    //Function for Generating a single String for Eligiblity..
+    private String eligibilityGenerator(){
+        String single = "";
+        String temp = "";
+        String temp2 = "";
+        if (allRadioBtn.isSelected()){
+            return "All Candidates Allowed";
+        }
+        else if (filterRadioBtn.isSelected()){
+            if (yearofAdmCBox.isSelected()) {
+                if (startingYear.equals(endingYear)) {
+                    temp = "Year: " + startingYear;
+                } else {
+                    temp = "Year: " + startingYear + "-" + endingYear;
+                }
+            }
+            if (courseCBox.isSelected()){
+                if (isMCAChecked)
+                    temp2 = " MCA ,";
+                if (isBtechChecked)
+                    temp2 += " Btech ,";
+                if (isMtechChecked)
+                    temp2 += " Mtech ,";
+                if (isArtsChecked)
+                    temp2 += " Arts ,";
+            }
+            if (courseCBox.isSelected() && yearofAdmCBox.isSelected()){
+                single = temp + " and Course:"+temp2;
+                if (single.endsWith(",")){
+                    single = single.substring(0,single.length()-1);
+                }
+            }
+            else
+                return temp;
+
+        }
+        return single;
+    }
+
 }

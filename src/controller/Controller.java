@@ -57,12 +57,21 @@ public class Controller {
 
     }
 
+    //Method for Getting Election Id's form the Database whoose eligibilty set to none...
+    public ArrayList<ElectionId> getElectionIdForNonEligiblityFromDB() throws SQLException {
+        //Creating Connection With DB and getting Result through Database Class...
+        db.createConnection();
+        return  db.getElectionIdsForNonEligiblityFromDB();
+
+    }
+
 
     //Method for getting data from ElectionDetails and CandidateDetails from
     //database and send  to ViewElection
      public  ArrayList<ElectionDetailsPrintData> getPrintableElectionDataFromDB(String searchEid) throws IOException, SQLException {
        return db.getPrintableElectionData(searchEid);
     }
+
 
     /*
     Function for Getting All Voters Data from VoterPanel <---  NewVoterRegistrationPanel...
@@ -99,8 +108,8 @@ public class Controller {
     }
 
     //Method for Inserting Data Into Eligiblity table from Eligiblity Panel..
-    public int addEligibilityData(String electionId, Boolean allCandidates, Integer startingYear, Integer endingYear, Boolean isMCAselected, Boolean isBtechSelected, Boolean isMtechSelected, Boolean isArtsSelected) throws SQLException {
-        EligibilityData dat = new EligibilityData(electionId,allCandidates,startingYear,endingYear,isMCAselected,isBtechSelected,isMtechSelected,isArtsSelected);
+    public int addEligibilityData(String electionId, Boolean allCandidates, Integer startingYear, Integer endingYear, Boolean isMCAselected, Boolean isBtechSelected, Boolean isMtechSelected, Boolean isArtsSelected,String singleEligibility) throws SQLException {
+        EligibilityData dat = new EligibilityData(electionId,allCandidates,startingYear,endingYear,isMCAselected,isBtechSelected,isMtechSelected,isArtsSelected,singleEligibility);
         db.createConnection();
         return db.addEligibilityDataToDB(dat);
     }
