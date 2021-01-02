@@ -1,7 +1,9 @@
 package window;
 
+import splash.LodingScreen;
 import window.createelection.CreateElection;
 import window.eligiblity.EligibilityPanel;
+import window.token.TokenGeneratorPanel;
 import window.updatevoter.UpdateVoterPanel;
 import window.viewelection.ViewElections;
 import window.newvoter.VoterPanel;
@@ -19,7 +21,10 @@ public class MainWindow extends JFrame {
     private VoterPanel voterPanel;
     private UpdateVoterPanel updateVoterPanel;
     private EligibilityPanel eligibilityPanel;
+    private TokenGeneratorPanel tokenGeneratorPanel;
     private JPanel contentPanel;
+
+
 
 
     public MainWindow(){
@@ -39,13 +44,37 @@ public class MainWindow extends JFrame {
         menuPanel = new MenuPanel();
         contentPanel = new JPanel();
 
-        //Setting Up Content Panel Layout and Border
+
+        //Setting Up Content Panel Layout
+        contentPanel.setLayout(null);
+
+        //Designing DashBoard adding Images and Text to it...
+        //Adding An Image to img Label for dashBoard Image and align it to centre of the Label..
+        JLabel imgLabel = new JLabel(new ImageIcon("src/images/mai.png"));
+        imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel logoText = new JLabel("OVS");
+        JLabel logoCap = new JLabel("Change the Way of Voting...");
+        logoText.setFont(new Font("Ubuntu",Font.BOLD,30));
+        logoText.setForeground(Color.decode("#b3445a"));
+        logoCap.setFont(new Font("Arial",Font.ITALIC,9));
+        logoCap.setForeground(Color.decode("#849fe3"));
+
+        //Adding Image to content Panel...
+        contentPanel.add(imgLabel);
+        contentPanel.add(logoText);
+        contentPanel.add(logoCap);
+        imgLabel.setBounds(0,20,610,580);
+        logoText.setBounds(15,15,100,50);
+        logoCap.setBounds(62,54,300,15);
+
         contentPanel.setLayout(new BorderLayout());
-        contentPanel.setBorder(BorderFactory.createEtchedBorder());
+
+        /////Dashboard Design Ends....../////
 
         //Adding Panels to the Frame
         add(menuPanel,BorderLayout.WEST);
         add(contentPanel,BorderLayout.CENTER);
+
 
         //Setting Visiblity of Frame
         setVisible(true);
@@ -59,10 +88,12 @@ public class MainWindow extends JFrame {
                     //Creating New Instance each time so that Data may be Refreshed..
                     createElection =new CreateElection();
                     changePanel(createElection);
+
                 }
                 else if(btn.equals("btn2")){
                     viewElections = new ViewElections();
                     changePanel(viewElections);
+
                 }
                 else if (btn.equals("btn3")){
                     voterPanel =new VoterPanel();
@@ -75,6 +106,10 @@ public class MainWindow extends JFrame {
                 else if (btn.equals("btn5")){
                     eligibilityPanel = new EligibilityPanel();
                     changePanel(eligibilityPanel);
+                }
+                else if (btn.equals("btn6")){
+                    tokenGeneratorPanel = new TokenGeneratorPanel();
+                    changePanel(tokenGeneratorPanel);
                 }
 
             }

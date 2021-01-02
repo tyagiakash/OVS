@@ -8,6 +8,7 @@ import window.newvoter.NewVoterRegistrationPanelEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 //This Class Acts as A Controller Between Models And Other Classes......
@@ -29,7 +30,6 @@ public class Controller {
         String date = ev.getDate();
 
         //Create connection using Database and add Data and then Close Connection
-        db.createConnection();
         db.addElectionDetailsToDB(id,title,noOfCan,place,date);
 
     }
@@ -43,8 +43,8 @@ public class Controller {
         String cPhtotoPath  = ev.getCandidatePhotoPath();
         String cSymbolPhotoPath = ev.getCandidateSymbolPhotoPath();
 
-        //Create connection using Database and add Data and then Close Connection
-        db.createConnection();
+        //add Data to DB..
+
         db.addCandidateDetailsToDB(elId,cId,cName,cDetails,cDetails,cPhtotoPath,cSymbolPhotoPath);
 
     }
@@ -52,7 +52,6 @@ public class Controller {
     //Method for Getting Election Id's form the Database...
     public ArrayList<ElectionId> getElectionIdFromDB() throws SQLException {
         //Creating Connection With DB and getting Result through Database Class...
-        db.createConnection();
         return  db.getElectionIdsFromDB();
 
     }
@@ -60,7 +59,7 @@ public class Controller {
     //Method for Getting Election Id's form the Database whoose eligibilty set to none...
     public ArrayList<ElectionId> getElectionIdForNonEligiblityFromDB() throws SQLException {
         //Creating Connection With DB and getting Result through Database Class...
-        db.createConnection();
+
         return  db.getElectionIdsForNonEligiblityFromDB();
 
     }
@@ -71,7 +70,6 @@ public class Controller {
      public  ArrayList<ElectionDetailsPrintData> getPrintableElectionDataFromDB(String searchEid) throws IOException, SQLException {
        return db.getPrintableElectionData(searchEid);
     }
-
 
     /*
     Function for Getting All Voters Data from VoterPanel <---  NewVoterRegistrationPanel...
@@ -89,7 +87,6 @@ public class Controller {
         String city = ev.getCity();
         String mobileNo = ev.getMobileNo();
 
-        db.createConnection();
         db.addVoterDetailsToDB(emailId,registrationNo,yeraofAdm,name,fName,gender,course,city,mobileNo);
     }
 
@@ -97,7 +94,6 @@ public class Controller {
     Function for searching a result in databse if it is availabe then we can update it
      */
     public UpdateVoter searchVoter(String id, String type) throws SQLException, IOException {
-        db.createConnection();
         temp = db.searchVoterToDB(id,type);
         return  temp;
     }
@@ -108,10 +104,18 @@ public class Controller {
     }
 
     //Method for Inserting Data Into Eligiblity table from Eligiblity Panel..
-    public int addEligibilityData(String electionId, Boolean allCandidates, Integer startingYear, Integer endingYear, Boolean isMCAselected, Boolean isBtechSelected, Boolean isMtechSelected, Boolean isArtsSelected,String singleEligibility) throws SQLException {
-        EligibilityData dat = new EligibilityData(electionId,allCandidates,startingYear,endingYear,isMCAselected,isBtechSelected,isMtechSelected,isArtsSelected,singleEligibility);
-        db.createConnection();
+    public String addEligibilityData(String electionId, Boolean allCandidates,String courseEligibility,String yearEligibility ,String singleEligibility) throws SQLException {
+        EligibilityData dat = new EligibilityData(electionId,allCandidates,courseEligibility,yearEligibility,singleEligibility);
         return db.addEligibilityDataToDB(dat);
     }
+
+    public ArrayList<TokenData> getTokenData(Integer voterId) throws IOException, SQLException {
+        return db.searchVoterForTokenToDB(voterId);
+    }
+
+    public Timestamp  setTokenDate(Timestamp timestamp, Integer voterId,String electionId) throws SQLException {
+        return db.setTokenDateToDB(timestamp,voterId,electionId);
+    }
+
 
 }

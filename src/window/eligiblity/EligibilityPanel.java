@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class EligibilityPanel extends JPanel implements ItemListener, ActionListener {
 
-    private JComboBox<String> electionsComboBox;
+    private JComboBox electionsComboBox;
     private JLabel electionsCbJLabel;
     private JPanel headPanel;
     private JPanel contentPanel;
@@ -50,6 +50,8 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
     private Boolean isCourseCBoxChecked = false;
     private Boolean isYearOfAdmCBoxChecked = false;
     private String currentElectionId;
+    private String courseEligibility ="(";
+    private String yearEligibility  = "(";
 
     public EligibilityPanel() throws SQLException {
 
@@ -119,21 +121,15 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         courseCBox.setEnabled(false);
 
         //Adding action Listners on All Radio Button....
-        allRadioBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                yearofAdmCBox.setEnabled(false);
-                courseCBox.setEnabled(false);
-            }
+        allRadioBtn.addActionListener(e -> {
+            yearofAdmCBox.setEnabled(false);
+            courseCBox.setEnabled(false);
         });
 
         //Adding action Listners on Filter Radio button...
-        filterRadioBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                yearofAdmCBox.setEnabled(true);
-                courseCBox.setEnabled(true);
-            }
+        filterRadioBtn.addActionListener(actionEvent -> {
+            yearofAdmCBox.setEnabled(true);
+            courseCBox.setEnabled(true);
         });
 
 
@@ -145,37 +141,31 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
 
     //Adding Items To Combo Box
         electionsComboBox.addItem("Select");
-        for(int i =0;i<electionIDs.size();i++){
-            electionsComboBox.addItem(electionIDs.get(i).getElectionId());
+        for (ElectionId id : electionIDs) {
+            electionsComboBox.addItem(id.getElectionId());
         }
 
         //Listner to @electionComboBox..
-        electionsComboBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                String currentId = (String) itemEvent.getItem();
-                if (currentId != "Select") {
-                    contentPanel.setVisible(true);
-                    currentElectionId = currentId;
-                }
-                else {
-                    contentPanel.setVisible(false);
-                }
+        electionsComboBox.addItemListener(itemEvent -> {
+            String currentId = (String) itemEvent.getItem();
+            if (!currentId.equals("Select")) {
+                contentPanel.setVisible(true);
+                currentElectionId = currentId;
+            }
+            else {
+                contentPanel.setVisible(false);
             }
         });
 
         //Adding Item Listner to Combo Box
 
         //@electioComboBox
-        electionsComboBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-               String currentId = (String) e.getItem();
-                for (int i=0;i<electionIDs.size();i++){
-                    if (currentId.equals(electionIDs.get(i).getElectionId())){
-                        electionTitleJlabel.setText(electionIDs.get(i).getElectionTitle());
-                        break;
-                    }
+        electionsComboBox.addItemListener(e -> {
+           String currentId = (String) e.getItem();
+            for (ElectionId electionID : electionIDs) {
+                if (currentId.equals(electionID.getElectionId())) {
+                    electionTitleJlabel.setText(electionID.getElectionTitle());
+                    break;
                 }
             }
         });
@@ -193,40 +183,34 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         artsCB.addItemListener(this);
 
         //Adding Listner to YearofAdmCBox..
-        yearofAdmCBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
+        yearofAdmCBox.addItemListener(itemEvent -> {
 
-                if (yearofAdmCBox.isSelected()) {
-                    isYearOfAdmCBoxChecked = true;
-                    startingYearCBox.setEnabled(true);
-                    endingYearCBox.setEnabled(true);
-                }
-                else {
-                    startingYearCBox.setEnabled(false);
-                    endingYearCBox.setEnabled(false);
-                }
+            if (yearofAdmCBox.isSelected()) {
+                isYearOfAdmCBoxChecked = true;
+                startingYearCBox.setEnabled(true);
+                endingYearCBox.setEnabled(true);
+            }
+            else {
+                startingYearCBox.setEnabled(false);
+                endingYearCBox.setEnabled(false);
             }
         });
 
         //Adding Listner to CourseCheckBox..
-        courseCBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
+        courseCBox.addItemListener(itemEvent -> {
 
-                if (courseCBox.isSelected()) {
-                    isCourseCBoxChecked = true;
-                    mcaCB.setEnabled(true);
-                    btechCB.setEnabled(true);
-                    mtechCB.setEnabled(true);
-                    artsCB.setEnabled(true);
-                }
-                else {
-                    mcaCB.setEnabled(false);
-                    btechCB.setEnabled(false);
-                    mtechCB.setEnabled(false);
-                    artsCB.setEnabled(false);
-                }
+            if (courseCBox.isSelected()) {
+                isCourseCBoxChecked = true;
+                mcaCB.setEnabled(true);
+                btechCB.setEnabled(true);
+                mtechCB.setEnabled(true);
+                artsCB.setEnabled(true);
+            }
+            else {
+                mcaCB.setEnabled(false);
+                btechCB.setEnabled(false);
+                mtechCB.setEnabled(false);
+                artsCB.setEnabled(false);
             }
         });
 
@@ -374,33 +358,33 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
         JButton btn = (JButton) e.getSource();
         if (btn.equals(saveBtn)){
 
+            String message = "";
+
+            if (courseEligibility.equals("()"))
+                courseEligibility = "('')";
+            if (yearEligibility.equals("()"))
+                yearEligibility = "('')";
+
             String temp = eligibilityGenerator();
+
             //First Check Whether Criteria is All or Filtered and then send data to controller..
             if (filterRadioBtn.isSelected()){
-                Integer check = null;
                 try {
-                    check = controller.addEligibilityData(currentElectionId,false,startingYear,endingYear,isMCAChecked,isBtechChecked,isMtechChecked,isArtsChecked,temp);
+                    message = controller.addEligibilityData(currentElectionId,false,courseEligibility,yearEligibility,temp);
 
                 } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                    message = throwables.toString();
                 }
-                if (check == 1){
-                    JOptionPane.showMessageDialog(null,currentElectionId+" :Inserted","Inserted!!",JOptionPane.INFORMATION_MESSAGE);
-                }
-
             }
             else if (allRadioBtn.isSelected()){
-                System.out.println("All");
-                Integer check = null;
                 try {
-                    check = controller.addEligibilityData(currentElectionId,true,null,null,false,false,false,false,temp);
+                    message = controller.addEligibilityData(currentElectionId,true,"","",temp);
                 } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                    message = throwables.toString();
                 }
-                if (check == 1){
-                    JOptionPane.showMessageDialog(null,currentElectionId+" :Inserted","Inserted!!",JOptionPane.INFORMATION_MESSAGE);
-                }
+
             }
+            JOptionPane.showMessageDialog(null,message,"Eligiblity",JOptionPane.INFORMATION_MESSAGE);
         }
 
     }
@@ -427,20 +411,42 @@ public class EligibilityPanel extends JPanel implements ItemListener, ActionList
             if (yearofAdmCBox.isSelected()) {
                 if (startingYear.equals(endingYear)) {
                     temp = "Year: " + startingYear;
+                    yearEligibility += startingYear +",";
                 } else {
                     temp = "Year: " + startingYear + "-" + endingYear;
+                    for (Integer i = startingYear;i<=endingYear;i++){
+                        yearEligibility += i +",";
+                    }
                 }
             }
             if (courseCBox.isSelected()){
-                if (isMCAChecked)
+                if (isMCAChecked) {
                     temp2 = " MCA ,";
-                if (isBtechChecked)
+                    courseEligibility +=  "'mca',";
+                }
+                if (isBtechChecked) {
                     temp2 += " Btech ,";
-                if (isMtechChecked)
+                    courseEligibility +=  "'btech',";
+                }
+                if (isMtechChecked) {
                     temp2 += " Mtech ,";
-                if (isArtsChecked)
+                    courseEligibility +=  "'mtech',";
+                }
+                if (isArtsChecked) {
                     temp2 += " Arts ,";
+                    courseEligibility +=  "'arts',";
+                }
             }
+
+
+            if(!courseEligibility.equals("(")){
+                courseEligibility = courseEligibility.substring(0,courseEligibility.length()-1);
+            }
+            if (!yearEligibility.equals("(")){
+                yearEligibility = yearEligibility.substring(0,yearEligibility.length()-1);
+            }
+            courseEligibility += ")";
+            yearEligibility += ")";
             if (courseCBox.isSelected() && yearofAdmCBox.isSelected()){
                 single = temp + " and Course:"+temp2;
                 if (single.endsWith(",")){

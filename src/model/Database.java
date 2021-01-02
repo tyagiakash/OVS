@@ -1,7 +1,5 @@
 package model;
 
-import window.createelection.CreateElection;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -12,10 +10,11 @@ import java.util.ArrayList;
 
 public class Database extends Component {
 
-    //Create Varibale for Srtup Connection
-    private Connection conn = null;
+    //Create Varibale for Connection class which is common for All Instances
+    //once created at the Start of the program...
+    public static Connection conn = null;
 
-    //Function for create Connection between OVS and DB
+    //Creating Function  for Creating A connection....
     public  void createConnection(){
         if(conn != null) return;
         try{
@@ -25,7 +24,7 @@ public class Database extends Component {
             //Connecting to Db using credntials...
              conn= DriverManager.getConnection(
                     "jdbc:mysql://db4free.net/ovsdbms","ovsadmin","12345670");
-             System.out.println("Connected Successfuly!!!!!!!");
+
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Error Occured During Connectio..");
             e.printStackTrace();
@@ -327,29 +326,33 @@ public class Database extends Component {
     Method for inserting data into Eligibility Table from Eligibility Panel..
      */
 
-    public int addEligibilityDataToDB(EligibilityData data) throws SQLException {
+    public String addEligibilityDataToDB(EligibilityData data) throws SQLException {
 
+        try {
 
-        if (data.getAllCandidates()){
-            String querry = "INSERT INTO Eligibility(ElectionId,AllCandidates)" + " values (?,?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(querry);
-            preparedStatement.setString(1,data.getElectionId());
-            preparedStatement.setBoolean(2,true);
-            preparedStatement.execute();
+            if (data.getAllCandidates()) {
+                //If eligiblity is All Candidates then Add all Voters to the Token Tables
+                //as they all eligible for election....
+                String querry = "INSERT INTO Tokens(VoterId) SELECT Voters.VoterId FROM Voters";
+                PreparedStatement preparedStatement = conn.prepareStatement(querry);
+                preparedStatement.execute();
+            } else {
+                String querry = "INSERT INTO `Tokens`(`VoterId`)" + " SELECT Voters.VoterId FROM Voters WHERE Voters.Course IN " + data.getCourseEligibility() +" OR Voters.AdmissionYear IN " + data.getYearEligibility();
+                PreparedStatement stmt = conn.prepareStatement(querry);
+                System.out.println(querry);
+                stmt.execute();
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return e.toString();
         }
-        else {
-            String querry = "INSERT INTO Eligibility(ElectionId,AllCandidates,StartingYear,EndingYear,MCA,BTech,MTech,Arts)" + " values (?,?,?,?,?,?,?,?)";
-            PreparedStatement stmt = conn.prepareStatement(querry);
-            stmt.setString(1,data.getElectionId());
-            stmt.setBoolean(2,false);
-            stmt.setInt(3,data.getStartingYear());
-            stmt.setInt(4,data.getEndingYear());
-            stmt.setBoolean(5,data.getMCAselected());
-            stmt.setBoolean(6,data.getBtechSelected());
-            stmt.setBoolean(7,data.getMtechSelected());
-            stmt.setBoolean(8,data.getArtsSelected());
-            stmt.execute();
-        }
+
+        //Also Inserting Election ID to the Token After Successfully ..INserting Voters Id..
+        String query = "UPDATE `Tokens` SET `ElectionId`= ? WHERE Tokens.ElectionId IS NULL";
+        PreparedStatement updateId = conn.prepareStatement(query);
+        updateId.setString(1,data.getElectionId());
+        updateId.executeUpdate();
 
         //Also inserting Eligibility to the Election Details table...
         PreparedStatement update = conn.prepareStatement
@@ -359,8 +362,62 @@ public class Database extends Component {
         update.setString(2,data.getElectionId());
         update.executeUpdate();
 
-        return 1;
+        return "Eligiblity Saved for Election Id: " + data.getElectionId();
     }
+
+    //Function for Searching a record of voter and for  Generating Token
+    // and getting data from Table tokens and voters...
+    public ArrayList<TokenData> searchVoterForTokenToDB(Integer id) throws SQLException, IOException {
+
+        ArrayList<TokenData> data = new ArrayList<>();
+
+        String query = "SELECT *\n" +
+                "FROM Tokens t\n" +
+                "JOIN Voters v ON v.VoterId = t.VoterId\n" +
+                "JOIN ElectionDetails e ON e.ElectionId = t.ElectionId\n" +
+                "WHERE t.VoterId = "+id;
+
+        // Create statement object..
+        Statement stmt = conn.createStatement();
+
+        // execute the preparedstatement and save to ResultSet ob..
+        ResultSet rs = stmt.executeQuery(query);
+
+        while (rs.next()) {
+            String electionId = rs.getString("ElectionId");
+            String voterName = rs.getString("Name");
+            String title = rs.getString("ElectionTitle");
+            String status = rs.getString("Status");
+            Integer token = rs.getInt("TokenNumber");
+            Timestamp tokenDate = rs.getTimestamp("TokenDate");
+
+            //Create object for class Tokendata and insert data to the object
+            //and pass it to array of this class...
+
+            TokenData temp = new TokenData(electionId,voterName,title,status,token,tokenDate);
+            data.add(temp);
+        }
+        rs.close();
+       return data;
+    }
+
+    //Function to Update Time Stamp in Tokens Table...
+    public Timestamp setTokenDateToDB(Timestamp timestamp,Integer voterId ,String electionId) throws SQLException {
+
+        //Also Inserting Election ID to the Token After Successfully ..INserting Voters Id..
+        String query = "UPDATE `Tokens` SET `TokenDate`= ? WHERE Tokens.VoterId = ? AND Tokens.ElectionId = ?";
+        PreparedStatement updateId = conn.prepareStatement(query);
+        updateId.setTimestamp(1,timestamp);
+        updateId.setInt(2,voterId);
+        updateId.setString(3,electionId);
+        updateId.executeUpdate();
+        return timestamp;
+
+    }
+
+
+
+
 
     //Functionn to convert A Blob object to Buffered Image and resize it
     private ImageIcon convertImage(Blob b) throws SQLException, IOException {

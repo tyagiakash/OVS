@@ -32,8 +32,9 @@ public class MenuPanel extends JPanel implements ActionListener {
 
         setBackground(Color.decode("#f2edf0"));
 
+
         //Creating Border
-        Border inner = BorderFactory.createEmptyBorder(40,1,40,1);
+        Border inner = BorderFactory.createEmptyBorder(40,2,40,3);
         Border outer = BorderFactory.createEtchedBorder();
         setBorder(BorderFactory.createCompoundBorder(outer,inner));
 
@@ -45,7 +46,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         btn3 = new JButton("New Voter");
         btn4 = new JButton("Update Voter");
         btn5 = new JButton("Eligibility");
-        btn6 = new JButton("Six");
+        btn6 = new JButton("Token Generator");
 
 
         //Removing Focus Of Button Text

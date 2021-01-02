@@ -1,5 +1,7 @@
 package login;
 
+import window.MainWindow;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -10,6 +12,7 @@ public class MainFrame extends JFrame {
     public MainFrame(){
         // Calling Constructor of Jframe for Setting Title
         super("Online Voting System");
+
 
         // Setting The Layout of The Frame as Border Layout
         setLayout(new BorderLayout());
@@ -36,6 +39,7 @@ public class MainFrame extends JFrame {
 
         //Set Visiblity of Login Frame
         setVisible(true);
+        setLocationRelativeTo(null);
 
         // Setting Close Button Behaviour
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,7 +48,10 @@ public class MainFrame extends JFrame {
             String userId = e.getUserId();
             String password = e.getPassword();
             String userType = e.getUserType();
-            System.out.println(userId + " , " +  password + " and " + userType);
+
+            //Opening Main Window here and Dispose the Login Panel..
+            new MainWindow();
+            dispose();
         });
 
     }
